@@ -2,13 +2,12 @@
 
 A lab experiment from [Digital Unknown](https://www.digitalunknown.com/spare-parts): an interactive simulator for an autonomous freight hump yard. Modular battery vehicles get humped, sorted, charged, and reassembled into outbound platoons. Every knob is a variable you can tweak.
 
-Each version is a single self-contained HTML file. No build step, no dependencies. Open it in a browser.
+The sim is a single self-contained HTML file. No build step, no dependencies. Open it in a browser.
 
 ## Run it
-- **v2 (latest):** `yard-control-v2.html`
-- **v1 (frozen):** `yard-control-v1.html`
+Open `yard-control-v2.html`.
 
-## What's in v2
+## What's in it
 - Hump yard track graph with 45° turnouts: receiving R-01..04, hump, bowl B-01..12, charging CH-01/02, departure D-01..03, sidings
 - Play, step, speed, live variable sliders, outcome tiles, click-to-open dossiers
 - Timeline scrubbing with deterministic replay (edits in replay branch the run)
@@ -24,7 +23,7 @@ Keyboard: Space play/pause, ←/→ scrub, +/− zoom, 0 fit.
 ![Cargo editor](images/cargo-editor.png)
 
 ## Layout
-- `yard-control-v2.html`, `yard-control-v1.html`: the builds
+- `yard-control-v2.html`: the build
 - `v2/src/`: v2 source. `python3 v2/build.py` rebuilds `v2/index.html` (copy it to `yard-control-v2.html`)
 - `v2/test/`: Playwright tests (`npm i` in `v2/test`, then `node e2e.js`, `scrub.js`, `faults.js`, `anchor.js`, `asm.js`, plus `soak.js` / `fsoak.js`)
 
