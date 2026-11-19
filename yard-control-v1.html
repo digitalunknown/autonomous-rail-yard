@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Yard Control · Blockline Labs</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0a0c0f;--panel:#0e1114;--panel2:#13171b;--line:#1d2228;--line2:#2a3139;--text:#e9edf1;--muted:#7c8691;--dim:#4d5560;--lime:#c6f432;--cobalt:#3d6bff;--yellow:#f5c542;--red:#ff4b3e;
+--sans:Inter,"Inter var",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.mono{font-family:var(--mono)}
+#app{display:grid;grid-template-columns:1fr 320px;grid-template-rows:52px minmax(0,1fr);height:100vh;min-width:1180px;min-height:760px}
+header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 18px;border-bottom:1px solid var(--line);background:#0b0d10}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-weight:700;letter-spacing:.22em;font-size:12px}
+.mark{display:flex;gap:2px}.mark i{display:block;width:4px;height:16px;border-radius:1px}
+.vsep{width:1px;height:20px;background:var(--line2)}
+.product{font-weight:600;font-size:14px}
+.chip-labs{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--yellow);border:1px solid rgba(245,197,66,.55);border-radius:4px;padding:3px 7px}
+.grow{flex:1}
+.hbox{font-family:var(--mono);font-size:11px;color:var(--text);display:flex;align-items:center;gap:8px}
+.hbox span{color:var(--muted);font-size:9.5px;letter-spacing:.14em}
+.scenario{border:1px solid var(--line2);background:var(--panel2);border-radius:6px;padding:7px 12px}
+.live{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;border:1px solid var(--line2);border-radius:20px;padding:6px 12px;color:var(--muted)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--dim)}
+.live.on{color:var(--yellow);border-color:rgba(245,197,66,.6)}
+.live.on i{background:var(--yellow);box-shadow:0 0 8px var(--yellow);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+#left{display:grid;grid-template-rows:auto minmax(0,1fr) 108px;min-width:0;min-height:0;border-right:1px solid var(--line)}
+#outcomes{padding:12px 18px 12px;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted);margin-bottom:9px}
+.badge{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:20px;padding:3px 9px;color:#aab3bd}
+.badge i{width:6px;height:6px;border-radius:50%;background:var(--yellow)}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 13px 10px;position:relative;min-width:0}
+.tile .tt{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:#aeb6bf}
+.tile .tt .dot{width:7px;height:7px;border-radius:2px;background:var(--lime)}
+.tile .simtag{margin-left:auto;font-size:8px;letter-spacing:.1em;color:var(--dim);border:1px solid var(--line2);border-radius:3px;padding:1px 4px}
+.tile .val{display:flex;align-items:baseline;gap:6px;margin:6px 0 3px}
+.tile .val b{font-size:27px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile .val small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.tile .sub{font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-lime{color:var(--lime)!important}.c-yellow{color:var(--yellow)!important}.c-red{color:var(--red)!important}.c-cobalt{color:#7d9bff!important}
+#mapwrap{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0}
+.map-head{display:flex;justify-content:space-between;align-items:center;padding:9px 18px 6px}
+.map-title{font-weight:600;font-size:13px;display:flex;align-items:center;gap:10px}
+.map-sub{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim);margin-top:3px}
+.schip{font-family:var(--mono);font-size:9px;letter-spacing:.12em;border-radius:4px;padding:2px 7px;font-weight:600}
+.schip.ok{background:rgba(198,244,50,.12);color:var(--lime);border:1px solid rgba(198,244,50,.4)}
+.schip.warn{background:rgba(245,197,66,.12);color:var(--yellow);border:1px solid rgba(245,197,66,.45)}
+.schip.bad{background:var(--red);color:#fff;border:1px solid var(--red)}
+.layers{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--dim);border:1px solid var(--line2);border-radius:6px;padding:4px 6px 4px 10px}
+.layers button{font-family:var(--mono);font-size:10px;letter-spacing:.02em;color:var(--muted);padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:5px}
+.layers button::before{content:"";width:6px;height:6px;border-radius:50%;border:1px solid var(--dim)}
+.layers button.on{color:var(--text)}.layers button.on::before{background:var(--lime);border-color:var(--lime)}
+#mapbox{position:relative;min-height:0;overflow:hidden}
+#map{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+#dossier{position:absolute;width:236px;background:rgba(14,17,20,.94);border:1px solid var(--line2);border-radius:9px;padding:11px 12px;backdrop-filter:blur(6px);font-size:11px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#dossier.sel{border-color:rgba(61,107,255,.75);box-shadow:0 0 0 1px rgba(61,107,255,.25),0 10px 30px rgba(0,0,0,.45)}
+.dz-k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--muted)}
+.dz-head{display:flex;align-items:center;justify-content:space-between;margin:5px 0 9px}
+.dz-id{font-family:var(--mono);font-size:15px;font-weight:600}
+.dz-pill{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;border-radius:3px;padding:2px 6px;font-weight:600}
+.dz-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-top:1px solid var(--line);font-family:var(--mono);font-size:10.5px}
+.dz-row span:first-child{color:var(--muted);font-size:9px;letter-spacing:.12em}
+.socbar{display:inline-block;width:54px;height:4px;border-radius:2px;background:#262c33;margin-right:7px;vertical-align:middle;overflow:hidden}
+.socbar i{display:block;height:100%}
+.dz-chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px}
+.dz-chips i{width:15px;height:6px;border-radius:1.5px}
+.dz-empty{color:var(--muted);font-size:11px;line-height:1.45}
+.dz-x{font-family:var(--mono);color:var(--dim);font-size:13px;padding:0 2px}
+#legend{position:absolute;right:14px;bottom:12px;background:rgba(14,17,20,.92);border:1px solid var(--line2);border-radius:8px;padding:9px 12px;display:grid;grid-template-columns:auto auto auto;gap:4px 18px;font-family:var(--mono);font-size:9px;color:#aab3bd}
+#legend .lh{font-size:8px;letter-spacing:.14em;color:var(--dim)}
+#legend span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+#legend em{display:inline-block;width:16px;height:2px}
+#legend b{display:inline-block;width:10px;height:5px;border-radius:1px}
+#bottom{display:grid;grid-template-columns:330px 1fr;border-top:1px solid var(--line);background:#0b0d10;min-width:0}
+.transport{display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 18px;border-right:1px solid var(--line)}
+.trow{display:flex;align-items:center;gap:10px}
+#play{width:46px;height:46px;border-radius:50%;background:var(--lime);color:#0a0c0f;display:grid;place-items:center;position:relative;box-shadow:0 0 0 0 rgba(198,244,50,.5);transition:transform .1s}
+#play:hover{transform:scale(1.05)}
+#play.idle{animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(198,244,50,.45)}70%{box-shadow:0 0 0 12px rgba(198,244,50,0)}100%{box-shadow:0 0 0 0 rgba(198,244,50,0)}}
+.cbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;color:var(--text)}
+.cbtn:hover{border-color:#4a535d;background:var(--panel2)}
+.clock .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--muted)}
+.clock .t{font-family:var(--mono);font-size:15px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.seg{display:flex;gap:4px}
+.seg button{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:5px;padding:5px 11px;background:var(--panel)}
+.seg button.on{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.rbtn{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line2);border-radius:5px;padding:5px 10px;margin-left:auto}
+.rbtn:hover{color:var(--text)}
+.tl{display:grid;grid-template-rows:auto minmax(0,1fr);padding:9px 16px 6px;min-width:0}
+.tl-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;letter-spacing:.13em;color:var(--muted)}
+.tl-head .lg{display:flex;gap:12px}.tl-head .lg span{display:flex;align-items:center;gap:5px}
+.tl-head .lg i{display:inline-block;width:8px;height:8px;border-radius:2px}
+.tlbox{position:relative;min-height:0}#tl{position:absolute;inset:0;width:100%;height:100%;display:block}
+aside{display:flex;flex-direction:column;background:#0b0d10;overflow-y:auto;min-height:0}
+.ph{padding:16px 20px 12px;border-bottom:1px solid var(--line)}
+.ph .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--lime)}
+.ph .row{display:flex;justify-content:space-between;align-items:baseline;margin-top:5px}
+.ph h2{font-size:15px;font-weight:600}
+.ph button{font-size:11px;color:var(--muted)}.ph button:hover{color:var(--text)}
+.grp{padding:11px 20px 2px;border-bottom:1px solid var(--line)}
+.grp>.k{font-family:var(--mono);font-size:9px;letter-spacing:.16em;color:var(--dim);margin-bottom:10px}
+.var{margin-bottom:10px}
+.var .vh{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px}
+.var .vh b{font-family:var(--mono);font-size:11.5px;font-weight:600}
+.var .vr{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:2px}
+.var .note{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:3px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer;--c:var(--lime);--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:linear-gradient(to right,var(--c) 0,var(--c) var(--p),#2a3038 var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#0e1114;border:2.5px solid var(--c);margin-top:-6px}
+input[type=range]::-moz-range-track{height:3px;background:#2a3038;border-radius:2px}
+input[type=range]::-moz-range-progress{height:3px;background:var(--c)}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:#0e1114;border:2.5px solid var(--c)}
+.toggle{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;margin-bottom:12px}
+.sw{width:34px;height:18px;border-radius:10px;background:#2a3038;position:relative;transition:.15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#7c8691;transition:.15s}
+.sw.on{background:var(--lime)}.sw.on::after{left:19px;background:#0a0c0f}
+.rule{display:flex;gap:5px;margin-bottom:7px}
+.rule button{flex:1;font-size:11.5px;border:1px solid var(--line2);border-radius:6px;padding:7px 0;background:var(--panel);color:#c5ccd3}
+.rule button.on{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.rdesc{font-size:11px;color:var(--muted);line-height:1.45;margin-bottom:12px;min-height:32px}
+.fault{border:1px solid var(--line2);border-radius:8px;padding:11px 12px;margin-bottom:12px;background:var(--panel)}
+.fault.on{border-color:rgba(255,75,62,.6);background:rgba(255,75,62,.06)}
+.fault .fh{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12px;font-weight:600}
+.fault .fs{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin:4px 0 10px;line-height:1.5}
+.fbtn{width:100%;font-weight:600;font-size:12.5px;border-radius:6px;padding:9px 0;border:1px solid var(--red);color:var(--red)}
+.fbtn:hover{background:rgba(255,75,62,.1)}
+.fault.on .fbtn{background:var(--red);color:#fff}
+.foot{padding:12px 20px 16px;font-family:var(--mono);font-size:9.5px;color:var(--dim);line-height:1.6;margin-top:auto}
+kbd{font-family:var(--mono);border:1px solid var(--line2);border-radius:3px;padding:0 4px;color:var(--muted)}
+
+#zoomctl{position:absolute;top:10px;right:14px;display:flex;align-items:center;gap:2px;background:rgba(14,17,20,.92);border:1px solid var(--line2);border-radius:7px;padding:3px;font-family:var(--mono);z-index:3}
+#zoomctl button{width:26px;height:24px;border-radius:5px;color:#c5ccd3;font-size:14px;line-height:1}
+#zoomctl button:hover{background:var(--panel2);color:#fff}
+#zoomctl #zFit{width:auto;padding:0 8px;font-size:10.5px;letter-spacing:.06em}
+#zPct{min-width:44px;text-align:center;font-size:10.5px;color:var(--text)}
+#mini{position:absolute;top:44px;right:14px;width:210px;height:100px;border:1px solid var(--line2);border-radius:7px;cursor:pointer;display:none;z-index:3}
+#replayBar{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:12px;background:rgba(61,107,255,.16);border:1px solid rgba(61,107,255,.7);border-radius:20px;padding:5px 6px 5px 14px;font-family:var(--mono);font-size:11px;backdrop-filter:blur(6px);z-index:3}
+#replayBar .rb-k{color:#8fa8ff;letter-spacing:.14em;font-size:10px;font-weight:700}
+#replayBar b{font-size:12px}
+#replayBar #rbLive{color:var(--muted);font-size:10px}
+#replayBar button{background:var(--lime);color:#0a0c0f;border-radius:14px;padding:4px 11px;font-weight:700;font-size:10.5px;font-family:var(--mono)}
+.live.replay{color:#8fa8ff;border-color:rgba(61,107,255,.7)}.live.replay i{background:var(--cobalt);box-shadow:0 0 8px var(--cobalt);animation:none}
+.tl-head .tlh-l{white-space:nowrap;display:flex;align-items:center;gap:10px}
+#liveBtn{font-family:var(--mono);font-size:9px;letter-spacing:.12em;border:1px solid var(--line2);border-radius:10px;padding:2px 8px;color:var(--muted);display:flex;align-items:center;gap:5px}
+#liveBtn i{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+#liveBtn.on{color:var(--lime);border-color:rgba(198,244,50,.45)}#liveBtn.on i{background:var(--lime)}
+#liveBtn.go{color:#0a0c0f;background:var(--lime);border-color:var(--lime);cursor:pointer}#liveBtn.go i{background:#0a0c0f}
+#tl{cursor:pointer;touch-action:none}
+#map{touch-action:none}
+#tltip{position:absolute;pointer-events:none;display:none;background:rgba(14,17,20,.97);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;font-family:var(--mono);font-size:10px;color:var(--text);white-space:nowrap;transform:translate(-50%,-100%);z-index:5;line-height:1.5}
+#tltip .k{color:var(--muted)}
+</style></head>
+<body>
+<div id="app">
+<header>
+  <div class="brand"><span class="mark"><i style="background:var(--lime)"></i><i style="background:var(--cobalt)"></i><i style="background:var(--yellow)"></i></span>BLOCKLINE</div>
+  <div class="vsep"></div><div class="product">Yard Control</div><span class="chip-labs">LABS · SIM</span>
+  <div class="grow"></div>
+  <div class="hbox scenario"><span>SCENARIO</span>Hump · Kestrel Flats</div>
+  <div class="hbox"><span>SIM TIME</span><b id="hdrTime">T+00:00:00</b></div>
+  <div class="live" id="liveChip"><i></i><span id="liveTxt">PAUSED</span></div>
+</header>
+<main id="left">
+  <section id="outcomes">
+    <div class="sec-head"><span>OUTCOMES · COMPUTED LIVE FROM THE SIM · ROLLING 2 H</span><span class="badge"><i></i>SIM DATA · NOT LIVE TELEMETRY</span></div>
+    <div class="tiles">
+      <div class="tile"><div class="tt"><i class="dot" id="d-dwell"></i>AVG DWELL<span class="simtag">SIM DATA</span></div><div class="val"><b id="v-dwell">—</b><small>min</small></div><div class="sub" id="s-dwell">target ≤ 75 min</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-ontime"></i>ON-TIME SORT<span class="simtag">SIM DATA</span></div><div class="val"><b id="v-ontime">—</b><small>%</small></div><div class="sub" id="s-ontime">right block, ≤ 75 min</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-proc"></i>PROCESSED<span class="simtag">SIM DATA</span></div><div class="val"><b id="v-proc">0</b><small>veh</small></div><div class="sub" id="s-proc">—</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-queue"></i>QUEUE LENGTH<span class="simtag">SIM DATA</span></div><div class="val"><b id="v-queue">0</b><small>veh</small></div><div class="sub" id="s-queue">—</div></div>
+      <div class="tile"><div class="tt"><i class="dot" style="background:var(--cobalt)"></i>COUPLERS<span class="simtag">SIM DATA</span></div><div class="val"><b>0</b><small>ever</small></div><div class="sub">platoons link by software</div></div>
+    </div>
+  </section>
+  <section id="mapwrap">
+    <div class="map-head">
+      <div><div class="map-title">Kestrel Flats · Hump yard <span id="statusChip" class="schip ok">FLOWING</span></div>
+      <div class="map-sub">12-TRACK BOWL · 4 RECEIVING · 3 DEPARTURE · 16 PX CENTRES · 0/45/90° GEOMETRY · SCHEMATIC</div></div>
+      <div class="layers">LAYERS <button data-l="routes" class="on">Routes</button><button data-l="signals" class="on">Signals</button><button data-l="ids" class="on">IDs</button><button data-l="tags" class="on">Tags</button></div>
+    </div>
+    <div id="mapbox"><canvas id="map"></canvas>
+      <div id="zoomctl"><button id="zOut" title="Zoom out (−)">−</button><span id="zPct">100%</span><button id="zIn" title="Zoom in (+)">+</button><button id="zFit" title="Fit (0)">Fit</button></div>
+      <canvas id="mini" title="Click to jump"></canvas>
+      <div id="replayBar"><span class="rb-k">◂◂ REPLAY</span><b id="rbT">T+00:00</b><span id="rbLive"></span><button id="rbGo">Go live ▸▸</button></div>
+      <div id="dossier"></div>
+      <div id="legend">
+        <span class="lh">TRACK</span><span class="lh">STATE</span><span class="lh">VEHICLE · SoC</span>
+        <span><em style="background:#8b939d"></em>Main line</span><span><em style="background:var(--lime)"></em>Flowing</span><span><b style="background:#c6f432"></b>75%+</span>
+        <span><em style="background:#4a525c"></em>Yard / bowl</span><span><em style="background:var(--cobalt)"></em>Selected</span><span><b style="background:#e3dc3a"></b>40–75%</span>
+        <span><em style="background:rgba(245,197,66,.7)"></em>Charging spur</span><span><em style="background:var(--red)"></em>Jam / fault</span><span><b style="background:#ff9a3c"></b>&lt; 20%</span>
+      </div>
+    </div>
+  </section>
+  <section id="bottom">
+    <div class="transport">
+      <div class="trow">
+        <button id="play" class="idle" title="Play / pause (Space)"><svg id="playIco" width="18" height="18" viewBox="0 0 18 18"><path d="M5 3.2v11.6L14.5 9z" fill="currentColor"/></svg></button>
+        <button class="cbtn" id="stepBtn" title="Step +1 sim-min (.)"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 2.5v9L9 7z" fill="currentColor"/><rect x="10" y="2.5" width="1.6" height="9" fill="currentColor"/></svg></button>
+        <div class="clock"><div class="k">RUN 01 · PLAYHEAD</div><div class="t" id="clock">T+00:00:00</div></div>
+      </div>
+      <div class="trow"><div class="seg" id="speedSeg"><button data-s="1">1×</button><button data-s="4" class="on">4×</button><button data-s="16">16×</button></div>
+        <button class="rbtn" id="resetBtn" title="Reset the run">↺ Reset</button></div>
+    </div>
+    <div class="tl"><div class="tl-head"><span class="tlh-l"><span>THROUGHPUT · 6 H · DRAG TO SCRUB</span><button id="liveBtn" class="on"><i></i>LIVE</button></span><span class="lg"><span><i style="background:var(--lime)"></i>SORTED</span><span><i style="background:#6b7480"></i>DEPARTED</span><span><i style="background:rgba(255,75,62,.55)"></i>JAM</span><span><i style="background:var(--red);transform:rotate(45deg) scale(.8)"></i>FAULT</span><span><i style="background:var(--cobalt)"></i>PLAYHEAD</span></span></div><div class="tlbox"><canvas id="tl"></canvas><div id="tltip"></div></div></div>
+  </section>
+</main>
+<aside>
+  <div class="ph"><div class="k" id="chgK">SIM VARIABLES · LIVE</div><div class="row"><h2>Run 01 · Kestrel Flats</h2><button id="defaultsBtn">Defaults</button></div></div>
+  <div class="grp"><div class="k">FLOW</div>
+    <div class="var"><div class="vh">Arrival rate<b id="o-rate"></b></div><input type="range" id="i-rate" min="2" max="30" step="1"><div class="vr"><span>2</span><span id="n-rate"></span><span>30</span></div></div>
+    <div class="var"><div class="vh">Hump speed<b id="o-hump"></b></div><input type="range" id="i-hump" min="1" max="8" step="0.5"><div class="vr"><span>1 km/h</span><span>8 km/h</span></div></div>
+  </div>
+  <div class="grp"><div class="k">PLATOONING</div>
+    <div class="var"><div class="vh">Platoon size<b id="o-size"></b></div><input type="range" id="i-size" min="2" max="12" step="1"><div class="vr"><span>2</span><span>inbound + outbound</span><span>12</span></div></div>
+  </div>
+  <div class="grp"><div class="k">ENERGY</div>
+    <div class="var"><div class="vh">SoC charge threshold<b id="o-soc"></b></div><input type="range" id="i-soc" min="0" max="60" step="5" style="--c:var(--yellow)"><div class="vr"><span>0%</span><span>below → CH-01/02</span><span>60%</span></div></div>
+    <div class="toggle">Opportunity charging<button class="sw on" id="chgToggle" aria-label="Opportunity charging"></button></div>
+  </div>
+  <div class="grp"><div class="k">SORTING</div>
+    <div class="rule" id="ruleSeg"><button data-r="dest" class="on">Destination</button><button data-r="soc">SoC</button><button data-r="fifo">FIFO</button></div>
+    <div class="rdesc" id="ruleDesc"></div>
+  </div>
+  <div class="grp"><div class="k">FAULT INJECTION</div>
+    <div class="fault" id="faultCard"><div class="fh">Turnout X-24 <span class="dz-pill" id="faultPill" style="background:#1d2228;color:var(--muted)">NOMINAL</span></div>
+    <div class="fs" id="faultSub">Bowl ladder · B-04 branch. Failing it cuts off B-04…B-12 and the charging spurs.</div>
+    <button class="fbtn" id="faultBtn">Trigger fault</button></div>
+  </div>
+  <div class="foot">Changes apply live to the running sim. <kbd>Space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> scrub · <kbd>+</kbd><kbd>−</kbd><kbd>0</kbd> zoom · scroll to zoom, drag to pan · click a vehicle or platoon tag to inspect. All values are simulated.</div>
+</aside>
+</div>
+<script>
+(function(){
+'use strict';
+const p2=n=>String(n).padStart(2,'0');
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function fmtT(t){t=Math.max(0,Math.floor(t));return 'T+'+p2(Math.floor(t/3600))+':'+p2(Math.floor(t/60)%60)+':'+p2(t%60);}
+let seed=7;
+function rnd(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
+function gauss(){const u=rnd()||1e-9,v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+// ---------------- parameters
+const DEF={rate:8,hump:4,size:6,socThr:25,chargeOn:true,rule:'dest'};
+const P=Object.assign({},DEF);
+const DT=0.5, LEN=12, GAP=1.5,   /* GAP: stopped car-to-car spacing (was 3) */ STOPOFF=4, THROW=4, RESV=60, LOOK=120, BIN=300;
+const SIM_PER_SEC=15;           // sim-seconds per real second at 1x
+const PULL_TIMEOUT=40*60, INSPECT=180, ASSEMBLE=120, CHG_RATE=3/60, CHG_FULL=85, TARGET_DWELL=75*60, FAULT_HOLD=25*60, FAULT_SPEED=2;
+const BLOCKS=[['CHI','Chicago',.24],['KCY','Kansas City',.18],['MEM','Memphis',.17],['DAL','Dallas',.15],['ATL','Atlanta',.14],['STL','St. Louis',.12]];
+const BLOCKNAME=Object.fromEntries(BLOCKS.map(b=>[b[0],b[1]]));
+const BANDS={MIX:'MIXED',S1:'SoC <35',S2:'SoC 35–55',S3:'SoC 55–75',S4:'SoC 75+',FIFO:'FIFO',CHG:'CHARGE'};
+function pickBlock(){let r=rnd();for(const b of BLOCKS){if((r-=b[2])<=0)return b[0];}return 'CHI';}
+
+// ---------------- track graph
+const NODES={},EDGES={},EL=[];
+function N(id,x,y){NODES[id]={id,x,y,in:[],out:[],sw:null};}
+function E(id,a,b,mid,o){o=o||{};const A=NODES[a],B=NODES[b];
+  const pts=[[A.x,A.y]].concat(mid||[],[[B.x,B.y]]);const cum=[0];let L=0;
+  for(let i=1;i<pts.length;i++){L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);cum.push(L);}
+  const e={id,from:A,to:B,pts,cum,len:L,track:o.track||'',kind:o.kind||'yard',vmax:o.v||1.4,stub:!!o.stub,occ:[]};
+  EDGES[id]=e;EL.push(e);A.out.push(e);B.in.push(e);return e;}
+// main lines
+N('A0',-40,34);N('X01',230,34);N('ML1E',1190,34);
+E('ML1a','A0','X01',null,{track:'ML1',kind:'main',v:3});E('ML1b','X01','ML1E',null,{track:'ML1',kind:'main',v:3});
+N('B0',1190,52);N('IX',900,52);N('PSe',700,52);N('PSw',420,52);N('S0',40,52);N('B9',-40,52);
+const M2o={track:'ML2',kind:'main',v:3};
+E('ML2a','B0','IX',null,M2o);E('ML2b','IX','PSe',null,M2o);E('ML2c','PSe','PSw',null,M2o);E('ML2d','PSw','S0',null,M2o);E('ML2e','S0','B9',null,M2o);
+N('INDe',800,70);E('IND01','IX','INDe',[[882,70]],{track:'IND-01',kind:'deco',stub:1});
+E('PS01','PSe','PSw',[[682,70],[438,70]],{track:'PS-01',kind:'deco'});
+N('SL1',88,100);N('SL2',106,118);N('SL1e',200,100);N('SL2e',200,118);N('SL3e',200,136);
+E('SLd1','S0','SL1',null,{track:'Storage ladder',kind:'deco'});E('SL01','SL1','SL1e',null,{track:'SL-01',kind:'deco',stub:1});
+E('SLd2','SL1','SL2',null,{track:'Storage ladder',kind:'deco'});E('SL02','SL2','SL2e',null,{track:'SL-02',kind:'deco',stub:1});
+E('SL03','SL2','SL3e',[[124,136]],{track:'SL-03',kind:'deco',stub:1});
+// receiving yard
+N('RX1',296,100);N('RX2',314,118);N('RX3',332,136);N('M1',700,100);N('M2',718,118);N('M3',736,136);N('M4',754,154);N('CR',1040,214);
+E('RL','X01','RX1',null,{track:'Entry lead',kind:'ladder',v:1.6});
+E('R01','RX1','M1',null,{track:'R-01',kind:'yard',v:1.6});E('Rd1','RX1','RX2',null,{track:'Receiving ladder',kind:'ladder',v:1.6});
+E('R02','RX2','M2',null,{track:'R-02',kind:'yard',v:1.6});E('Rd2','RX2','RX3',null,{track:'Receiving ladder',kind:'ladder',v:1.6});
+E('R03','RX3','M3',null,{track:'R-03',kind:'yard',v:1.6});E('R04','RX3','M4',[[350,154]],{track:'R-04',kind:'yard',v:1.6});
+E('Md1','M1','M2',null,{track:'Receiving ladder',kind:'ladder',v:1.2});E('Md2','M2','M3',null,{track:'Receiving ladder',kind:'ladder',v:1.2});E('Md3','M3','M4',null,{track:'Receiving ladder',kind:'ladder',v:1.2});
+E('LEAD','M4','CR',[[1010,154],[1040,184]],{track:'Hump lead RA-01',kind:'lead',v:1.2});
+// bowl
+for(let k=1;k<=14;k++){const y=250+16*(k-1);if(k<=13)N('X'+k,1004-16*(k-1),y);N('W'+k,600-16*(k-1),y);}
+E('Bd0','CR','X1',null,{track:'Bowl ladder',kind:'ladder',v:2});
+for(let k=1;k<=12;k++)E('Bd'+k,'X'+k,'X'+(k+1),null,{track:'Bowl ladder',kind:'ladder',v:2});
+for(let k=1;k<=12;k++)E('B'+p2(k),'X'+k,'W'+k,null,{track:'B-'+p2(k),kind:'bowl',v:1.4});
+E('CH01','X13','W13',null,{track:'CH-01',kind:'charge',v:1.2});
+E('CH02','X13','W14',[[796,458]],{track:'CH-02',kind:'charge',v:1.2});
+for(let k=1;k<=13;k++)E('Wd'+k,'W'+k,'W'+(k+1),null,{track:'Trim ladder',kind:'ladder',v:1.4});
+// departure
+N('Y1',360,490);N('Y2',344,506);N('Z1',110,490);N('Z2',94,506);N('Z3',78,522);N('EXn',-40,522);
+E('Wd14','W14','Y1',null,{track:'Trim lead',kind:'ladder',v:1.4});
+E('D01','Y1','Z1',null,{track:'D-01',kind:'dep',v:1.4});E('Yd1','Y1','Y2',null,{track:'Departure ladder',kind:'ladder',v:1.4});
+E('D02','Y2','Z2',null,{track:'D-02',kind:'dep',v:1.4});E('D03','Y2','Z3',[[328,522]],{track:'D-03',kind:'dep',v:1.4});
+E('Zd1','Z1','Z2',null,{track:'Departure ladder',kind:'ladder',v:1.6});E('Zd2','Z2','Z3',null,{track:'Departure ladder',kind:'ladder',v:1.6});
+E('EXIT','Z3','EXn',null,{track:'Exit → ML2 W',kind:'main',v:2.6});
+// switches
+const SWN={X01:'X-01',RX1:'X-02',RX2:'X-03',RX3:'X-04',M2:'X-05',M3:'X-06',M4:'X-07',Y1:'X-41',Y2:'X-42',Z2:'X-45',Z3:'X-46',PSe:'X-91',PSw:'X-92',IX:'X-93',S0:'X-94',SL1:'X-95',SL2:'X-96'};
+for(let k=1;k<=13;k++)SWN['X'+k]='X-'+(20+k);for(let k=2;k<=14;k++)SWN['W'+k]='X-'+(48+k);
+const SWITCHES=[];
+for(const n of Object.values(NODES)){
+  if(n.out.length>1)n.sw={type:'split'};else if(n.in.length>1)n.sw={type:'merge'};
+  if(n.sw){n.sw.id=SWN[n.id]||n.id;n.sw.node=n;n.sw.def=n.sw.type==='split'?n.out[0].id:n.in[0].id;n.sw.deco=(n.sw.type==='split'?n.out:n.in).some(e=>e.kind==='deco');SWITCHES.push(n.sw);}
+}
+const FAULT_SW=NODES.X4.sw; // X-24
+const R_IDS=['R01','R02','R03','R04'], D_IDS=['D01','D02','D03'];
+const BOWL=[],CH=[];
+for(let k=1;k<=12;k++)BOWL.push({id:'B-'+p2(k),edge:'B'+p2(k),k,isCH:false});
+CH.push({id:'CH-01',edge:'CH01',k:13,isCH:true},{id:'CH-02',edge:'CH02',k:14,isCH:true});
+const TRACKS=BOWL.concat(CH);
+for(const T of TRACKS)T.cap=Math.floor((EDGES[T.edge].len-24)/(LEN+GAP));
+
+function pointAt(e,s){s=clamp(s,0,e.len);let i=1;while(i<e.cum.length-1&&e.cum[i]<s)i++;
+  const a=e.pts[i-1],b=e.pts[i],d=e.cum[i]-e.cum[i-1],f=d?(s-e.cum[i-1])/d:0;
+  return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,Math.atan2(b[1]-a[1],b[0]-a[0])];}
+function subPath(e,a,b){const out=[pointAt(e,a)];for(let i=1;i<e.cum.length-1;i++)if(e.cum[i]>a&&e.cum[i]<b)out.push(e.pts[i]);out.push(pointAt(e,b));return out;}
+
+// path cache (cleared when faults change)
+const PC=new Map();
+function pathBetween(a,b){const key=a+'>'+b;if(PC.has(key))return PC.get(key);
+  const prev={};prev[a]=null;const q=[a];let h=0;
+  while(h<q.length){const id=q[h++];if(id===b)break;const n=EDGES[id].to;if(n.sw&&n.sw.failed)continue;
+    for(const o of n.out)if(!(o.id in prev)){prev[o.id]=id;q.push(o.id);}}
+  let p=null;if(b in prev){p=[];for(let c=b;c!==null;c=prev[c])p.push(c);p.reverse();}
+  PC.set(key,p);return p;}
+
+// ---------------- state
+let S;
+function newState(){
+  seed=7;PC.clear();
+  S={t:0,veh:[],pending:[],pendingThru:[],pl:{},nextPl:11,nextPv:401,arrAcc:0,arrNext:.35,thruAcc:900,thruNext:1500,
+     humpPl:null,pullPl:null,exitPl:null,crestHold:false,faultOn:false,faultT:0,departed:[],processed:0,sorted:0,
+     bins:[],dbins:[],qbins:[],jams:[],faults:[],jamOn:false,queue:0,diverted:0,qML:0,qHump:0,qFault:0,stepN:0};
+  for(const T of TRACKS)Object.assign(T,{key:null,assigned:0,inbound:0,closed:false});
+  for(const sw of SWITCHES)Object.assign(sw,{resBy:null,throwUntil:-1,failed:false,lined:sw.def,throws:0});
+  for(const e of EL)e.occ.length=0;
+  if(typeof SNAPS!=='undefined'){SNAPS=[];EVTS=[];HIST.liveT=0;HIST.tl=null;takeSnap();}
+}
+function newPlatoon(kind){let id,guard=0;do{id='PL-'+p2(S.nextPl);S.nextPl=S.nextPl>=899?11:S.nextPl+1;}while(S.pl[id]&&++guard<1000);
+  const pl={id,kind,veh:[],state:kind==='in'?'inbound':kind==='thru'?'through':'pulling',arrT:S.t,rtrack:null,path:null,dtrack:null,readyT:0,departT:0,dom:null};
+  S.pl[id]=pl;return pl;}
+function makeVeh(pl,thru){return {id:'PV-'+String(S.nextPv++).padStart(4,'0'),route:[],ri:0,s:LEN,v:0,len:LEN,
+  soc:clamp(58+gauss()*18,8,98),block:pickBlock(),state:thru?'through':'inbound',platoon:pl.id,target:null,
+  spawnT:S.t,classT:0,chargedT:0,res:[],wait:0,blocked:false,thru:!!thru,spawned:false};}
+const MAX_BACKLOG=150;
+function spawnPlatoon(){if(S.pending.length>=MAX_BACKLOG){S.diverted+=P.size;return;}const pl=newPlatoon('in');for(let i=0;i<P.size;i++){const v=makeVeh(pl);pl.veh.push(v);S.pending.push(v);}}
+function spawnThru(){const pl=newPlatoon('thru');const n=4+Math.floor(rnd()*5);for(let i=0;i<n;i++){const v=makeVeh(pl,true);pl.veh.push(v);S.pendingThru.push(v);}}
+function canEnter(eid){for(const o of EDGES[eid].occ)if(o.a<LEN+GAP+2)return false;return true;}
+function place(v,route){v.route=route;v.ri=0;v.s=LEN;v.v=1.2;v.spawned=true;S.veh.push(v);EDGES[route[0]].occ.push({veh:v,a:0,b:LEN});}
+
+function rebuildOcc(){for(const e of EL)e.occ.length=0;
+  for(const v of S.veh){const e=EDGES[v.route[v.ri]];const a=v.s-v.len;e.occ.push({veh:v,a:Math.max(0,a),b:v.s});
+    if(a<0&&v.ri>0){const p=EDGES[v.route[v.ri-1]];p.occ.push({veh:v,a:p.len+a,b:p.len});}}}
+function releaseAhead(v){v.res=v.res.filter(r=>{if(v.ri<r.idx){if(r.sw.resBy===v)r.sw.resBy=null;return false;}return true;});}
+function releaseAll(v){for(const r of v.res)if(r.sw.resBy===v)r.sw.resBy=null;v.res=[];}
+
+function freeDist(v){
+  let best=LOOK,acc=-v.s;const R=v.route;
+  for(let i=v.ri;i<R.length;i++){
+    if(acc>best)break;
+    const e=EDGES[R[i]],occ=e.occ;
+    for(let j=0;j<occ.length;j++){const o=occ[j];if(o.veh===v)continue;if(i===v.ri&&o.b<=v.s+1e-6)continue;const d=acc+o.a-GAP;if(d<best)best=d;}
+    const endD=acc+e.len;
+    if(best<endD-GAP-1)break; // someone is between us and the node: never claim it out of turn
+    if(i===R.length-1){const d=endD-STOPOFF;if(d<best)best=d;break;}
+    const sw=e.to.sw;
+    if(sw){
+      const want=sw.type==='split'?R[i+1]:e.id;let stop=false;
+      if(sw.failed&&!(sw.pass&&sw.pass.has(v)))stop=true;
+      else if(sw.resBy&&sw.resBy!==v)stop=true;
+      else if(!sw.resBy){
+        if(endD<RESV){sw.resBy=v;v.res.push({sw,idx:i+1});if(sw.lined!==want){sw.lined=want;sw.throwUntil=S.t+THROW;sw.throws++;}}
+        else stop=true;
+      }
+      if(!stop&&S.t<sw.throwUntil)stop=true;
+      if(stop){const d=endD-GAP-1;if(d<best)best=d;break;}
+    }
+    acc=endD;
+  }
+  return best;
+}
+function moveVeh(v){
+  const f=freeDist(v);const e=EDGES[v.route[v.ri]];
+  const vmax=e.id==='LEAD'?(S.faultOn?Math.min(P.hump,FAULT_SPEED):P.hump)*0.3:e.vmax;
+  const tgt=Math.max(0,Math.min(vmax,f*1.2));
+  v.v=tgt>v.v?Math.min(tgt,v.v+0.35*DT):tgt;
+  const ds=Math.min(v.v*DT,Math.max(0,f));if(ds<=0){v.v=0;return;}
+  v.s+=ds;
+  while(v.ri<v.route.length-1&&v.s>EDGES[v.route[v.ri]].len){v.s-=EDGES[v.route[v.ri]].len;v.ri++;}
+  const ce=EDGES[v.route[v.ri]];if(v.s>ce.len)v.s=ce.len;
+  if(!v.thru)v.soc=Math.max(3,v.soc-0.004*ds);
+}
+
+// ---------------- yard control
+function keyFor(v){if(P.rule==='dest')return v.block;if(P.rule==='soc')return v.soc<35?'S1':v.soc<55?'S2':v.soc<75?'S3':'S4';return 'FIFO';}
+function claim(T,key,v){T.key=key;T.assigned++;T.inbound++;if(key!=='CHG'&&T.assigned>=P.size)T.closed=true;v.target=T;return T;}
+function unassign(v){const T=v.target;if(!T)return;T.assigned--;T.inbound--;if(T.assigned<=0){T.assigned=0;T.key=null;T.closed=false;}v.target=null;}
+function faultHolding(){return S.faultOn&&S.t-S.faultT<FAULT_HOLD;}
+function assignTrack(v,from){
+  if(faultHolding())return null; // hump stopped while X-24 is inspected
+  if(P.chargeOn&&v.soc<P.socThr)for(const T of CH)if(T.assigned<T.cap&&pathBetween(from,T.edge))return claim(T,'CHG',v);
+  let key=keyFor(v);
+  // degraded mode while a turnout is failed: cuts with no open track of their own go to one mixed overflow track (a mis-sort)
+  if(S.faultOn&&key!=='FIFO'&&!BOWL.some(T=>T.key===key&&!T.closed&&T.assigned<T.cap&&pathBetween(from,T.edge)))key='MIX';
+  for(const T of BOWL)if(T.key===key&&!T.closed&&T.assigned<T.cap&&pathBetween(from,T.edge))return claim(T,key,v);
+  for(const T of BOWL)if(T.key===null&&T.assigned===0&&pathBetween(from,T.edge))return claim(T,key,v);
+  return null;}
+function emergencyAssign(v,from){ // stranded cuts must clear the ladder: any reachable bowl track with room
+  const S0=S.faultT;S.faultT=-1e9;let T=assignTrack(v,from);S.faultT=S0;if(T)return T;
+  for(const B of BOWL)if(B.assigned<B.cap&&pathBetween(from,B.edge))return claim(B,B.key||'MIX',v);
+  return null;}
+function routeTo(v,edgeId){const p=pathBetween(v.route[v.ri],edgeId);if(!p)return false;releaseAhead(v);v.route=v.route.slice(0,v.ri).concat(p);return true;}
+function extend(v,edgeId){const p=pathBetween(v.route[v.route.length-1],edgeId);if(p)v.route=v.route.concat(p.slice(1));return !!p;}
+function detach(v){const pl=S.pl[v.platoon];v.platoon=null;if(!pl)return;pl.veh=pl.veh.filter(x=>x!==v);if(!pl.veh.length)delete S.pl[pl.id];}
+function mode(a){const c={};let b=null,m=0;for(const x of a){c[x]=(c[x]||0)+1;if(c[x]>m){m=c[x];b=x;}}return b;}
+function binIdx(){const bi=Math.floor(S.t/BIN);while(S.bins.length<=bi){S.bins.push(0);S.dbins.push(0);S.qbins.push(0);}return bi;}
+
+function control(){
+  // arrivals (platoons/hr, jittered so changes apply live)
+  S.arrAcc+=DT*P.rate/3600;
+  if(S.arrAcc>=S.arrNext){S.arrAcc-=S.arrNext;S.arrNext=.55+.9*rnd();spawnPlatoon();}
+  S.thruAcc+=DT;if(S.thruAcc>=S.thruNext){S.thruAcc=0;S.thruNext=1500+rnd()*1500;spawnThru();}
+  if(S.pending.length&&canEnter('ML1a')){const v=S.pending.shift();const pl=S.pl[v.platoon];place(v,pl&&pl.path?pl.path.slice():['ML1a']);}
+  if(S.pendingThru.length&&canEnter('ML2a')){place(S.pendingThru.shift(),['ML2a','ML2b','ML2c','ML2d','ML2e']);}
+  const pls=Object.values(S.pl);
+  // receiving track assignment, in arrival order
+  for(const pl of pls){if(pl.kind!=='in'||pl.state!=='inbound'||pl.rtrack)continue;
+    const r=R_IDS.find(id=>EDGES[id].occ.length===0&&!pls.some(q=>q.kind==='in'&&q.rtrack===id));
+    if(r){pl.rtrack=r;pl.path=pathBetween('ML1a',r);for(const v of pl.veh)if(v.spawned&&v.ri===0)v.route=pl.path.slice();}
+    break;}
+  // platoon arrived in receiving
+  for(const pl of pls)if(pl.kind==='in'&&pl.state==='inbound'&&pl.rtrack&&pl.veh.every(v=>v.spawned&&v.route[v.ri]===pl.rtrack&&v.v<0.05)){
+    pl.state='receiving';pl.readyT=S.t+INSPECT;pl.recvT=S.t;for(const v of pl.veh)v.state='receiving';}
+  // hump release: one platoon at a time over the receiving exit ladder
+  if(S.humpPl){const pl=S.pl[S.humpPl];if(!pl||pl.veh.every(v=>{const i=v.route.indexOf('LEAD');return i>=0&&i<=v.ri;}))S.humpPl=null;}
+  if(!S.humpPl){let best=null,bv=Infinity;
+    for(const pl of pls){if(pl.kind!=='in'||pl.state!=='receiving'||S.t<pl.readyT)continue;
+      const score=P.rule==='soc'?pl.veh.reduce((a,v)=>a+v.soc,0)/pl.veh.length:pl.arrT;if(score<bv){bv=score;best=pl;}}
+    if(best){for(const v of best.veh){extend(v,'LEAD');v.state='humping';}best.state='humping';best.fromR=best.rtrack;best.rtrack=null;S.humpPl=best.id;}}
+  // hump crest: assign each cut a classification track
+  const onLead=S.veh.filter(v=>v.state==='humping'&&v.route[v.ri]==='LEAD'&&v.ri===v.route.length-1).sort((a,b)=>b.s-a.s);
+  S.crestHold=false;const LE=EDGES.LEAD;
+  for(const v of onLead){if(LE.len-v.s>50)break;const T=assignTrack(v,'LEAD');
+    if(!T){S.crestHold=true;break;}
+    extend(v,T.edge);v.state='rolling';detach(v);S.sorted++;S.bins[binIdx()]++;}
+  // stranded cuts (fault reroute) retry
+  if(S.stepN%10===0)for(const v of S.veh)if(v.state==='rolling'&&!v.target){const T=emergencyAssign(v,v.route[v.ri]);if(T&&!routeTo(v,T.edge))unassign(v);}
+  // classified on arrival
+  for(const v of S.veh)if(v.state==='rolling'&&v.target&&v.ri===v.route.length-1&&v.route[v.ri]===v.target.edge&&v.v<0.05){
+    v.state=v.target.isCH?'charging':'classified';v.classT=S.t;v.target.inbound--;}
+  // pulls: bowl track -> departure track, one at a time over the trim ladder
+  if(S.pullPl){const pl=S.pl[S.pullPl];if(!pl||pl.veh.every(v=>v.route[v.ri]===pl.dtrack))S.pullPl=null;}
+  if(!S.pullPl){const d=D_IDS.find(id=>EDGES[id].occ.length===0&&!Object.values(S.pl).some(q=>q.dtrack===id));
+    if(d){let best=null,bt=Infinity,bl=null;
+      for(const T of BOWL){if(!T.key||T.inbound>0)continue;const list=S.veh.filter(v=>v.target===T&&v.state==='classified');if(!list.length)continue;
+        let old=Infinity;for(const v of list)old=Math.min(old,v.classT);
+        if((T.closed||S.t-old>PULL_TIMEOUT)&&old<bt&&pathBetween(T.edge,d)){best=T;bt=old;bl=list;}}
+      for(const T of CH){const list=S.veh.filter(v=>v.target===T&&v.state==='charging').sort((a,b)=>b.s-a.s);const pre=[];
+        for(const v of list){if(v.soc>=CHG_FULL)pre.push(v);else break;}if(!pre.length)continue;
+        let old=Infinity;for(const v of pre)old=Math.min(old,v.chargedT);
+        if((pre.length>=P.size||S.t-old>900)&&old<bt&&pathBetween(T.edge,d)){best=T;bt=old;bl=pre;}}
+      if(best){const list=bl.sort((a,b)=>b.s-a.s).slice(0,P.size);const pl=newPlatoon('out');pl.dtrack=d;pl.fromT=best.id;
+        pl.dom=mode(list.map(v=>v.block));pl.relay=best.isCH;
+        for(const v of list){extend(v,d);v.state='pulling';v.platoon=pl.id;v.target=null;pl.veh.push(v);}
+        best.assigned-=list.length;if(best.assigned<=0){best.assigned=0;best.key=null;best.closed=false;}else best.closed=best.key!=='CHG'&&best.assigned>=P.size;
+        S.pullPl=pl.id;}}}
+  // departure assembly + exit, one at a time over the departure ladder
+  for(const pl of Object.values(S.pl))if(pl.kind==='out'&&pl.state==='pulling'&&pl.veh.every(v=>v.route[v.ri]===pl.dtrack&&v.ri===v.route.length-1&&v.v<0.05)){
+    pl.state='assembling';pl.departT=S.t+ASSEMBLE;for(const v of pl.veh)v.state='assembling';}
+  if(S.exitPl){const pl=S.pl[S.exitPl];if(!pl||pl.veh.every(v=>v.route[v.ri]==='EXIT'))S.exitPl=null;}
+  if(!S.exitPl){let best=null;for(const pl of Object.values(S.pl))if(pl.kind==='out'&&pl.state==='assembling'&&S.t>=pl.departT&&(!best||pl.departT<best.departT))best=pl;
+    if(best){for(const v of best.veh){extend(v,'EXIT');v.state='departing';}best.state='departing';best.fromD=best.dtrack;best.dtrack=null;S.exitPl=best.id;}}
+}
+const MOVING=new Set(['inbound','humping','rolling','pulling','departing','through']);
+function atDest(v){if(v.ri!==v.route.length-1)return false;const e=v.route[v.ri];
+  return (v.state==='inbound'&&R_IDS.includes(e))||(v.state==='rolling'&&v.target&&e===v.target.edge)||v.state==='pulling'||v.state==='departing'||v.state==='through';}
+function post(){
+  let qML=0,qHump=0,qFault=0;
+  for(const v of S.veh){
+    if(v.res.length)v.res=v.res.filter(r=>{if(v.ri>r.idx||(v.ri===r.idx&&v.s-v.len>0.5)){if(r.sw.resBy===v)r.sw.resBy=null;return false;}return true;});
+    if(v.state==='charging'&&v.v<0.05){v.soc=Math.min(100,v.soc+CHG_RATE*DT);if(v.soc>=CHG_FULL&&!v.chargedT)v.chargedT=S.t;}
+    if(MOVING.has(v.state)&&v.v<0.05&&!atDest(v))v.wait+=DT;else v.wait=0;
+    v.blocked=v.wait>45;
+    if(v.blocked&&!v.thru){if(v.state==='inbound')qML++;else if(v.state==='rolling'&&!v.target)qFault++;else qHump++;}
+  }
+  const keep=[];
+  for(const v of S.veh){const e=v.route[v.ri];
+    if((e==='EXIT'&&v.s>EDGES.EXIT.len-16)||(e==='ML2e'&&v.s>EDGES.ML2e.len-16)){
+      releaseAll(v);
+      if(!v.thru){const pl=S.pl[v.platoon];const dwell=S.t-v.spawnT;const correct=!!pl&&pl.dom===v.block;
+        S.departed.push({t:S.t,dwell,ok:correct&&dwell<=TARGET_DWELL});S.processed++;S.dbins[binIdx()]++;}
+      detach(v);}else keep.push(v);}
+  S.veh=keep;
+  while(S.departed.length&&S.departed[0].t<S.t-7200)S.departed.shift();
+  S.qML=qML+S.pending.length;S.qHump=qHump;S.qFault=qFault;S.queue=S.qML+qHump+qFault;
+  const bi=binIdx();S.qbins[bi]=Math.max(S.qbins[bi],S.queue);
+  if(!S.jamOn&&S.queue>=10){S.jamOn=true;S.jams.push({a:S.t,b:null});}
+  else if(S.jamOn&&S.queue<=4){S.jamOn=false;S.jams[S.jams.length-1].b=S.t;}
+}
+window.__faultHolding=()=>faultHolding();
+function step(){S.t+=DT;S.stepN++;rebuildOcc();control();for(const v of S.veh)moveVeh(v);post();
+  if(EVTS.length&&S.t<=HIST.liveT+1e-9)for(const e of EVTS)if(Math.abs(e.t-S.t)<1e-6)applyEvt(e);
+  if(S.t>HIST.liveT+1e-9){HIST.liveT=S.t;HIST.tl=null;const last=SNAPS[SNAPS.length-1];if(!last||S.t-last.t>=SNAP_EVERY-1e-9)takeSnap();}}
+// ---------------- history: snapshots every sim-minute (6 h ring) + deterministic re-sim for scrubbing
+const SNAP_EVERY=60,HIST_WIN=6*3600;
+let SNAPS=[];const HIST={liveT:0,tl:null};
+const SWIDX=new Map(SWITCHES.map((sw,i)=>[sw,i]));
+const TRACKBY=Object.fromEntries(TRACKS.map(T=>[T.id,T]));
+function cloneVeh(v){const o=Object.assign({},v);o.route=v.route.slice();o.target=v.target?v.target.id:null;o.res=v.res.map(r=>[SWIDX.get(r.sw),r.idx]);delete o._pts;return o;}
+function copyTL(b){return {departed:b.departed.map(d=>Object.assign({},d)),bins:b.bins.slice(),dbins:b.dbins.slice(),qbins:b.qbins.slice(),jams:b.jams.map(j=>Object.assign({},j)),faults:b.faults.map(f=>Object.assign({},f))};}
+function takeSnap(){
+  const all=S.veh.concat(S.pending,S.pendingThru);
+  const sn={t:S.t,seed,P:Object.assign({},P),V:all.map(cloneVeh),veh:S.veh.map(v=>v.id),pending:S.pending.map(v=>v.id),pendingThru:S.pendingThru.map(v=>v.id),
+    pl:Object.values(S.pl).map(pl=>Object.assign({},pl,{veh:pl.veh.map(v=>v.id)})),
+    T:TRACKS.map(T=>[T.key,T.assigned,T.inbound,T.closed]),
+    SW:SWITCHES.map(sw=>[sw.lined,sw.throwUntil,sw.failed,sw.throws,sw.resBy?sw.resBy.id:null,sw.pass?[...sw.pass].map(v=>v.id):null]),
+    base:Object.assign({},S,{veh:null,pending:null,pendingThru:null,pl:null},copyTL(S))};
+  if(SNAPS.length&&Math.abs(SNAPS[SNAPS.length-1].t-S.t)<1e-9)SNAPS[SNAPS.length-1]=sn;else SNAPS.push(sn);
+  while(SNAPS.length>2&&SNAPS[1].t<HIST.liveT-HIST_WIN)SNAPS.shift();
+}
+function restoreSnap(sn){
+  const byId={};
+  for(const o of sn.V){const v=Object.assign({},o);v.route=o.route.slice();v.target=o.target?TRACKBY[o.target]:null;v.res=o.res.map(([i,idx])=>({sw:SWITCHES[i],idx}));byId[v.id]=v;}
+  S=Object.assign({},sn.base,copyTL(sn.base));
+  S.veh=sn.veh.map(id=>byId[id]);S.pending=sn.pending.map(id=>byId[id]);S.pendingThru=sn.pendingThru.map(id=>byId[id]);
+  S.pl={};for(const o of sn.pl)S.pl[o.id]=Object.assign({},o,{veh:o.veh.map(id=>byId[id])});
+  TRACKS.forEach((T,i)=>{const a=sn.T[i];T.key=a[0];T.assigned=a[1];T.inbound=a[2];T.closed=a[3];});
+  SWITCHES.forEach((sw,i)=>{const a=sn.SW[i];sw.lined=a[0];sw.throwUntil=a[1];sw.failed=a[2];sw.throws=a[3];sw.resBy=a[4]?byId[a[4]]||null:null;sw.pass=a[5]?new Set(a[5].map(id=>byId[id]).filter(Boolean)):null;});
+  seed=sn.seed;Object.assign(P,sn.P);PC.clear();rebuildOcc();
+}
+function isReplay(){return S.t<HIST.liveT-1e-9;}
+function minScrubT(){return Math.max(SNAPS.length?SNAPS[0].t:0,HIST.liveT-HIST_WIN);}
+function advanceTo(t){while(S.t<t-1e-9)step();rebuildOcc();}
+function seek(t){
+  t=Math.round(clamp(t,minScrubT(),HIST.liveT)/DT)*DT;
+  if(Math.abs(t-S.t)<1e-9)return;
+  if(!isReplay()&&t<S.t&&!HIST.tl)HIST.tl={bins:S.bins,dbins:S.dbins,qbins:S.qbins,jams:S.jams,faults:S.faults};
+  if(!(t>S.t&&t-S.t<=2*SNAP_EVERY)){let sn=null;for(let i=SNAPS.length-1;i>=0;i--)if(SNAPS[i].t<=t+1e-9){sn=SNAPS[i];break;}if(!sn)return;restoreSnap(sn);}
+  advanceTo(t);if(!isReplay())HIST.tl=null;
+}
+// param/fault changes are logged so replay re-applies them at the same sim time
+let EVTS=[];
+function logEvt(){EVTS=EVTS.filter(e=>e.t<S.t-1e-6);EVTS.push({t:S.t,P:JSON.stringify(P),fault:S.faultOn});}
+function applyEvt(e){Object.assign(P,JSON.parse(e.P));setFault(e.fault);HIST.pv=(HIST.pv||0)+1;}
+function branch(){EVTS=EVTS.filter(e=>e.t<=S.t+1e-6);if(!isReplay())return;SNAPS=SNAPS.filter(s=>s.t<=S.t+1e-9);HIST.liveT=S.t;HIST.tl=null;}
+function paramChanged(){branch();takeSnap();logEvt();}
+function stateHash(){return S.t+'#'+S.processed+'#'+S.sorted+'#'+S.veh.map(v=>v.id+v.route[v.ri]+v.s.toFixed(4)+v.state).join('|')+'#'+TRACKS.map(T=>T.key+T.assigned).join(',');}
+function advance(sec){const n=Math.round(sec/DT);for(let i=0;i<n;i++)step();rebuildOcc();}
+function setFault(on){
+  if(on===S.faultOn)return;S.faultOn=on;FAULT_SW.failed=on;PC.clear();
+  if(on){S.faultT=S.t;S.faults.push({a:S.t,b:null});
+    FAULT_SW.pass=new Set();
+    for(const v of S.veh){if(v.state!=='rolling')continue;const R=v.route;
+      for(let i=v.ri;i<R.length-1;i++)if(EDGES[R[i]].to===FAULT_SW.node){
+        // already committed into X-24 (on its approach or holding it): finish the move
+        if(i===v.ri||FAULT_SW.resBy===v){FAULT_SW.pass.add(v);break;}
+        unassign(v);const T=emergencyAssign(v,R[v.ri]);
+        if(!(T&&routeTo(v,T.edge))){if(T)unassign(v);v.route=R.slice(0,i+1);releaseAhead(v);}
+        break;}}
+  }else{const f=S.faults[S.faults.length-1];if(f)f.b=S.t;}
+}
+// ---------------- rendering
+const MONO=getComputedStyle(document.documentElement).getPropertyValue('--mono').trim()||'monospace';
+const C={bg:'#0a0c0f',main:'#8b939d',yard:'#434b55',ladder:'#4a525c',lead:'#5d6670',deco:'#353c44',charge:'rgba(245,197,66,.62)',
+  lime:'#c6f432',cobalt:'#3d6bff',yellow:'#f5c542',red:'#ff4b3e',label:'#69727d',dim:'#4d5560',text:'#e9edf1'};
+const LAYERS={routes:true,signals:true,ids:true,tags:true};
+const WB={x0:-6,x1:1150,y0:12,y1:546};
+const mapC=document.getElementById('map'),mctx=mapC.getContext('2d');
+const tlC=document.getElementById('tl'),tctx=tlC.getContext('2d');
+const stat=document.createElement('canvas'),sctx=stat.getContext('2d');
+let VW=0,VH=0,DPR=1,K=1,OX=0,OY=0,Kfit=1,FOX=0,FOY=0;
+const view={z:1,cx:(WB.x0+WB.x1)/2,cy:(WB.y0+WB.y1)/2},ZMIN=.75,ZMAX=4;
+let TZ=1,SZ=1,VZ=1,SGZ=1,staticDirty=true; // world-unit multipliers so text/strokes grow gently with zoom
+const miniC=document.getElementById('mini'),nctx=miniC.getContext('2d');let MINI=null;
+let selected=null,hitTags=[];
+const SOC_STOPS=[[0,[255,110,48]],[20,[255,154,60]],[45,[232,216,58]],[75,[198,244,50]],[100,[181,240,32]]];
+function socRGB(s){for(let i=1;i<SOC_STOPS.length;i++){const[a,ca]=SOC_STOPS[i-1],[b,cb]=SOC_STOPS[i];if(s<=b){const f=(s-a)/(b-a);return ca.map((c,j)=>Math.round(c+(cb[j]-c)*f));}}return SOC_STOPS[4][1];}
+function socColor(s,al){const c=socRGB(s);return al==null?`rgb(${c})`:`rgba(${c},${al})`;}
+function setFont(ctx,sz,w){ctx.font=`${w||500} ${sz}px ${MONO}`;}
+function W2S(x,y){return [x*K+OX,y*K+OY];}
+function S2W(x,y){return [(x-OX)/K,(y-OY)/K];}
+function applyView(){view.z=clamp(view.z,ZMIN,ZMAX);view.cx=clamp(view.cx,WB.x0,WB.x1);view.cy=clamp(view.cy,WB.y0,WB.y1);
+  K=Kfit*view.z;OX=VW/2-view.cx*K;OY=VH/2-view.cy*K;const z=view.z;
+  TZ=Math.pow(z,-.65);SZ=Math.pow(z,-.5);VZ=Math.pow(z,-.3);SGZ=Math.pow(z,-.45);staticDirty=true;}
+function fitView(){view.z=1;view.cx=(WB.x0+WB.x1)/2;view.cy=(WB.y0+WB.y1)/2;applyView();}
+function zoomAt(f,sx,sy){const[wx,wy]=S2W(sx,sy);view.z=clamp(view.z*f,ZMIN,ZMAX);const k=Kfit*view.z;view.cx=wx-(sx-VW/2)/k;view.cy=wy-(sy-VH/2)/k;applyView();}
+function zoomTo(z){zoomAt(z/view.z,VW/2,VH/2);}
+function panBy(dx,dy){view.cx-=dx/K;view.cy-=dy/K;applyView();}
+function centerOn(wx,wy){view.cx=wx;view.cy=wy;applyView();}
+
+function resize(){
+  const box=document.getElementById('mapbox');DPR=window.devicePixelRatio||1;VW=box.clientWidth;VH=box.clientHeight;
+  for(const c of [mapC,stat]){c.width=Math.round(VW*DPR);c.height=Math.round(VH*DPR);}
+  Kfit=Math.min((VW-20)/(WB.x1-WB.x0),(VH-16)/(WB.y1-WB.y0));
+  FOX=(VW-(WB.x1-WB.x0)*Kfit)/2-WB.x0*Kfit;FOY=(VH-(WB.y1-WB.y0)*Kfit)/2-WB.y0*Kfit;
+  const dz=document.getElementById('dossier');const dx=6*Kfit+FOX,dy=176*Kfit+FOY;dz.style.left=Math.max(10,dx)+'px';dz.style.top=Math.max(8,dy)+'px';
+  const tw=tlC.clientWidth,th=tlC.clientHeight;tlC.width=Math.round(tw*DPR);tlC.height=Math.round(th*DPR);
+  miniC.width=Math.round(210*DPR);miniC.height=Math.round(100*DPR);
+  applyView();
+}
+function strokePts(ctx,pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke();}
+function edgeStyle(e){
+  if(e.kind==='main')return [C.main,1.7];if(e.kind==='lead')return [C.lead,1.6];if(e.kind==='charge')return [C.charge,1.5];
+  if(e.kind==='deco')return [C.deco,1.3];if(e.kind==='ladder')return [C.ladder,1.4];return [C.yard,1.4];}
+function label(ctx,txt,x,y,o){o=o||{};setFont(ctx,(o.size||7.5)*TZ,o.w||500);ctx.fillStyle=o.color||C.label;ctx.textAlign=o.align||'left';ctx.textBaseline='middle';
+  if('letterSpacing' in ctx)ctx.letterSpacing=((o.ls||0)*TZ)+'px';ctx.fillText(txt,x,y);if('letterSpacing' in ctx)ctx.letterSpacing='0px';}
+function drawStatic(){
+  const ctx=sctx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,stat.width,stat.height);
+  ctx.setTransform(DPR*K,0,0,DPR*K,DPR*OX,DPR*OY);ctx.lineCap='butt';ctx.lineJoin='miter';
+  // sleepers
+  ctx.strokeStyle='rgba(140,150,160,.13)';ctx.lineWidth=0.8*SZ;
+  for(const e of EL){const step=e.kind==='main'?6:7;for(let s=3;s<e.len;s+=step){const[x,y,a]=pointAt(e,s);const nx=-Math.sin(a)*2.4,ny=Math.cos(a)*2.4;ctx.beginPath();ctx.moveTo(x-nx,y-ny);ctx.lineTo(x+nx,y+ny);ctx.stroke();}}
+  for(const e of EL){const[c,w]=edgeStyle(e);ctx.strokeStyle=c;ctx.lineWidth=w*SZ;if(e.kind==='deco')ctx.setLineDash([]);strokePts(ctx,e.pts);}
+  // bumpers on stub ends
+  for(const e of EL)if(e.stub){const[x,y,a]=pointAt(e,e.len);const nx=-Math.sin(a)*4,ny=Math.cos(a)*4;ctx.strokeStyle='#a3acb6';ctx.lineWidth=2.2*SZ;
+    ctx.beginPath();ctx.moveTo(x-nx,y-ny);ctx.lineTo(x+nx,y+ny);ctx.stroke();ctx.fillStyle='#a3acb6';ctx.fillRect(x-1.5-Math.cos(a)*1.5,y-1.5-Math.sin(a)*1.5,3,3);}
+  // retarders
+  ctx.strokeStyle='rgba(245,197,66,.8)';ctx.lineWidth=0.9*SZ;
+  for(const T of TRACKS){const e=EDGES[T.edge];const[x,y]=pointAt(e,T.isCH?40:28);ctx.strokeRect(x-5,y-2.6,10,5.2);}
+  // crest marker
+  ctx.fillStyle='#8b939d';ctx.beginPath();ctx.moveTo(1046,196);ctx.lineTo(1052,192);ctx.lineTo(1052,200);ctx.closePath();ctx.fill();
+  // area labels
+  const A={size:7,color:'#56606a',ls:1.1};
+  label(ctx,'INBOUND · ML1 EAST ▸',2,22,A);label(ctx,'◂ ML2 WEST',1146,64,Object.assign({align:'right'},A));
+  label(ctx,'RECEIVING YARD · R-01…R-04',420,88,A);label(ctx,'HUMP LEAD · RA-01',860,144,A);
+  label(ctx,'HUMP CREST',1058,196,A);label(ctx,'CLASSIFICATION BOWL · 12 TRACKS',640,238,A);
+  label(ctx,'SERVICE · CHARGE CH-01/02',560,472,A);label(ctx,'DEPARTURE YARD · D-01…D-03',120,476,A);
+  label(ctx,'STORAGE',40,150,A);label(ctx,'◂ OUTBOUND · TO ML2 W',4,536,A);
+  if(LAYERS.ids){
+    const L={size:7.5,color:'#7a848f'};
+    for(const[t,y] of [['ML1',34],['ML2',52]]){const bw=20*TZ,bh=10*TZ;ctx.fillStyle='#0a0c0f';ctx.strokeStyle='#59626c';ctx.lineWidth=.8*SZ;ctx.fillRect(2,y-bh/2,bw,bh);ctx.strokeRect(2,y-bh/2,bw,bh);label(ctx,t,2+bw/2,y+.3*TZ,{size:7,align:'center',color:'#c3cad1',w:600});}
+    R_IDS.forEach((id,i)=>{const e=EDGES[id];label(ctx,'R-0'+(i+1),e.pts[0][0]-6-(i===3?0:0),[100,118,136,154][i],Object.assign({align:'right'},L));});
+    for(const T of TRACKS){const e=EDGES[T.edge];const p=e.pts[e.pts.length-1];label(ctx,T.id,p[0]-6,p[1],Object.assign({align:'right'},L));}
+    D_IDS.forEach((id,i)=>{label(ctx,'D-0'+(i+1),[368,352,352][i]+(i===2?0:0),[490,506,522][i]-(i===2?0:0),L);});
+    label(ctx,'SL-01',206,100,L);label(ctx,'SL-02',206,118,L);label(ctx,'SL-03',206,136,L);
+    label(ctx,'PS-01',560,78,L);label(ctx,'IND-01',840,78,L);
+    label(ctx,'X-01',232,24,{size:6.5,color:'#5d6670'});
+  }
+}
+// ---- dynamic
+const BODY_INSET=0.65; // drawn gap between stopped cars = GAP + 2*inset (was 3+2.2=5.2, now 1.5+1.3=2.8)
+function bodyPts(v){const e=EDGES[v.route[v.ri]];const a=v.s-v.len+BODY_INSET,b=v.s-BODY_INSET;
+  if(a>=0||v.ri===0)return subPath(e,Math.max(0,a),Math.max(0.01,b));
+  const p=EDGES[v.route[v.ri-1]];return subPath(p,Math.max(0,p.len+a),p.len).concat(b>0?subPath(e,0,b):[]);}
+function isSel(v){return selected&&((selected.type==='veh'&&selected.id===v.id)||(selected.type==='pl'&&v.platoon===selected.id));}
+// aspects: 'go' (green), 'warn' (amber: ready, waiting for clearance), 'stop' (red, routine), 'red' (red, hold/fault)
+function sigState(kind,id){
+  if(window.__sigOverride){const o=window.__sigOverride(kind,id);if(o)return o;}
+  if(kind==='entry')return S.veh.some(v=>v.state==='inbound'&&v.route.length===1&&v.blocked)?'stop':'go';
+  if(kind==='R'){if(S.veh.some(v=>v.state==='humping'&&v.route[v.ri]===id))return 'go';
+    return Object.values(S.pl).some(q=>q.kind==='in'&&q.state==='receiving'&&q.rtrack===id&&S.t>=q.readyT)?'warn':'stop';}
+  if(kind==='crest')return S.crestHold?'red':'go';
+  if(kind==='W'){if(S.veh.some(v=>v.state==='pulling'&&v.route[v.ri]===id))return 'go';
+    const T=TRACKS.find(t=>t.edge===id);return T&&T.closed&&T.inbound===0&&T.assigned>0?'warn':'stop';}
+  if(kind==='D'){if(S.veh.some(v=>v.state==='departing'&&v.route[v.ri]===id))return 'go';
+    return Object.values(S.pl).some(q=>q.kind==='out'&&q.state==='assembling'&&q.dtrack===id&&S.t>=q.departT)?'warn':'stop';}
+  return 'stop';}
+const LAMPS=[['go',[72,214,96]],['warn',[245,176,48]],['stop',[255,75,62]]]; // green, amber, red
+function drawSignal(ctx,x,ty,st,sc,abs){sc=(sc||1)*SGZ;const y=abs?ty:ty-6.2*sc;
+  const w=15*sc,h=5.6*sc,r=h/2,gap=4.5*sc,lr=1.55*sc,sr=2.15*sc;
+  // short mast to the track
+  ctx.strokeStyle='#3a3f45';ctx.lineWidth=.8*sc;ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(x,y+r+2.2*sc);ctx.stroke();
+  // pill housing with darker ring
+  rrect(ctx,x-w/2,y-r,w,h,r);ctx.fillStyle='#2d2d2e';ctx.fill();ctx.strokeStyle='#141516';ctx.lineWidth=.9*sc;ctx.stroke();rrect(ctx,x-w/2-.7*sc,y-r-.7*sc,w+1.4*sc,h+1.4*sc,r+.7*sc);ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=.5*sc;ctx.stroke();
+  const lit=st==='red'?'stop':st;let active=null;
+  // pass 1: every socket, then the inactive lamps (dimmed)
+  LAMPS.forEach(([k],i)=>{const cx=x+(i-1)*gap;ctx.fillStyle='#0b0c0d';ctx.beginPath();ctx.arc(cx,y,sr,0,7);ctx.fill();});
+  LAMPS.forEach(([k,c],i)=>{const cx=x+(i-1)*gap;if(k===lit){active=[cx,c];return;}
+    ctx.fillStyle=`rgba(${c},.3)`;ctx.beginPath();ctx.arc(cx,y,lr,0,7);ctx.fill();});
+  // pass 2: the active lamp and its glow last, so it is always the top layer
+  if(active){const[cx,c]=active,strong=st!=='stop';
+    ctx.fillStyle=`rgba(${c},${strong?.32:.2})`;ctx.beginPath();ctx.arc(cx,y,(strong?3.9:3.3)*sc,0,7);ctx.fill();
+    ctx.fillStyle=`rgb(${c})`;ctx.beginPath();ctx.arc(cx,y,lr,0,7);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.beginPath();ctx.arc(cx-.45*sc,y-.45*sc,.45*sc,0,7);ctx.fill();}}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function plLabel(pl){const n=pl.veh.length;
+  if(pl.kind==='thru')return `${pl.id} ×${n} → ML2 W`;
+  if(pl.kind==='in'){if(pl.state==='inbound')return pl.rtrack?`${pl.id} ×${n} → ${EDGES[pl.rtrack].track}`:`${pl.id} ×${n} · hold X-01`;
+    if(pl.state==='receiving'){const r=pl.readyT-S.t;return r>0?`${pl.id} ×${n} · inspect ${Math.ceil(r/60)}m`:`${pl.id} ×${n} · ready ▸ hump`;}
+    return `${pl.id} ×${n} → hump`;}
+  const b=pl.relay?'relay':pl.dom;
+  if(pl.state==='pulling')return `${pl.id} ×${n} ${b} → ${EDGES[pl.dtrack].track}`;
+  if(pl.state==='assembling'){const r=pl.departT-S.t;return r>0?`${pl.id} ×${n} ${b} · dep ${Math.ceil(r/60)}m`:`${pl.id} ×${n} ${b} · wait exit`;}
+  return `${pl.id} ×${n} ${b} → ML2 W`;}
+function draw(){
+  const ctx=mctx;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=C.bg;ctx.fillRect(0,0,mapC.width,mapC.height);
+  // faint grid
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='rgba(255,255,255,.035)';
+  for(let x=(OX%24);x<VW;x+=24)for(let y=(OY%24);y<VH;y+=24)ctx.fillRect(x,y,1,1);
+  if(staticDirty){drawStatic();staticDirty=false;}ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(stat,0,0);
+  ctx.setTransform(DPR*K,0,0,DPR*K,DPR*OX,DPR*OY);ctx.lineCap='butt';
+  // occupancy overlays
+  if(LAYERS.routes){for(const e of EL){if(!e.occ.length)continue;let bl=false,mv=false;for(const o of e.occ){if(o.veh.blocked&&!o.veh.thru)bl=true;else if(o.veh.v>0.05)mv=true;}
+    if(bl){ctx.strokeStyle='rgba(255,75,62,.9)';ctx.lineWidth=2.2*SZ;strokePts(ctx,e.pts);}else if(mv){ctx.strokeStyle='rgba(198,244,50,.55)';ctx.lineWidth=1.8*SZ;strokePts(ctx,e.pts);}}}
+  // fault: dead branch
+  if(S.faultOn){ctx.setLineDash([3*SZ,3*SZ]);ctx.strokeStyle='rgba(255,75,62,.75)';ctx.lineWidth=1.6*SZ;for(const e of FAULT_SW.node.out)strokePts(ctx,e.pts.slice(0,2));ctx.setLineDash([]);}
+  // selected route
+  if(selected&&selected.type==='veh'){const v=S.veh.find(x=>x.id===selected.id);if(v){ctx.setLineDash([4*SZ,3*SZ]);ctx.strokeStyle='rgba(61,107,255,.85)';ctx.lineWidth=1.6*SZ;
+    const e0=EDGES[v.route[v.ri]];strokePts(ctx,subPath(e0,v.s,e0.len));for(let i=v.ri+1;i<v.route.length;i++)strokePts(ctx,EDGES[v.route[i]].pts);ctx.setLineDash([]);}}
+  // switches
+  for(const sw of SWITCHES){const n=sw.node;const leg=EDGES[sw.lined];if(!leg)continue;
+    const pts=sw.type==='split'?subPath(leg,0,Math.min(9,leg.len)):subPath(leg,Math.max(0,leg.len-9),leg.len);
+    const throwing=S.t<sw.throwUntil;
+    ctx.strokeStyle=sw.failed?C.red:throwing?C.yellow:sw.resBy?C.lime:(sw.deco?'#59616a':'#9aa3ad');ctx.lineWidth=(throwing||sw.resBy?2.2:1.7)*SZ;strokePts(ctx,pts);
+    ctx.fillStyle=sw.failed?C.red:'#c3cad1';ctx.beginPath();ctx.arc(n.x,n.y,1.3*SZ,0,7);ctx.fill();}
+  // signals
+  if(LAYERS.signals){drawSignal(ctx,212,34,sigState('entry'),1.1);
+    R_IDS.forEach(id=>{const e=EDGES[id];const p=e.pts[e.pts.length-1];drawSignal(ctx,p[0]-24,p[1],sigState('R',id),1.05);});
+    drawSignal(ctx,1027,204,sigState('crest'),1.1,true);
+    for(const T of TRACKS){const e=EDGES[T.edge];const p=e.pts[e.pts.length-1];drawSignal(ctx,p[0]+24,p[1],sigState('W',T.edge),1);}
+    D_IDS.forEach(id=>{const p=EDGES[id].pts[EDGES[id].pts.length-1];drawSignal(ctx,p[0]+24,p[1],sigState('D',id),1);});}
+  // bowl track readouts
+  if(LAYERS.ids)for(const T of TRACKS){const n=EDGES[T.edge].from;const dead=S.faultOn&&!pathBetween('LEAD',T.edge);
+    const y=T.k===14?458:n.y;const x=(T.k===14?n.x+4:n.x)+9;
+    label(ctx,T.isCH?(T.k===13?'X-33':''):FAULT_SW.node===n?'X-24':'X-'+(20+T.k),x,y,{size:6.5,color:FAULT_SW.node===n&&S.faultOn?C.red:'#5d6670'});
+    const kx=x+22;
+    if(dead)label(ctx,'CUT OFF',kx,y,{size:7,color:C.red,w:600});
+    else if(T.key){const t=T.key.length===3?T.key:BANDS[T.key];label(ctx,`${t} ${T.assigned}/${T.isCH?T.cap:P.size}`,kx,y,{size:7,color:T.closed?C.yellow:T.isCH?C.yellow:'#aab3bd',w:600});}
+    else label(ctx,'open',kx,y,{size:7,color:'#4d5560'});}
+  // vehicles
+  for(const v of S.veh){const pts=bodyPts(v);v._pts=pts;const sel=isSel(v);
+    if(sel){ctx.strokeStyle='rgba(61,107,255,.45)';ctx.lineWidth=10*VZ;strokePts(ctx,pts);}
+    else if(v.blocked&&!v.thru){ctx.strokeStyle=C.red;ctx.lineWidth=8.2*VZ;strokePts(ctx,pts);}
+    const parked=v.state==='classified'||v.state==='receiving'||v.state==='assembling';
+    ctx.strokeStyle=sel?C.cobalt:socColor(v.soc,v.thru?.5:parked?.82:1);ctx.lineWidth=5.6*VZ;strokePts(ctx,pts);
+    if(v.state==='charging'&&v.soc<CHG_FULL){const h=pts[pts.length-1];ctx.fillStyle=(Math.floor(performance.now()/500)%2)?C.yellow:'#0a0c0f';ctx.fillRect(h[0]-VZ,h[1]-VZ,2*VZ,2*VZ);}}
+  // hump hold / crest
+  if(S.crestHold){const tz=TZ;TZ=1;ctx.save();ctx.translate(1050,222);ctx.scale(tz,tz);ctx.translate(-1050,-222);rrect(ctx,1050,222,(faultHolding()?76:68),12,2.5);ctx.fillStyle=C.red;ctx.fill();label(ctx,faultHolding()?'HUMP STOPPED':'HUMP HOLD',1088,228.5,{size:7,align:'center',color:'#fff',w:700,ls:.6});ctx.restore();TZ=tz;}
+  // platoon tags
+  hitTags=[];
+  if(LAYERS.tags)for(const pl of Object.values(S.pl)){const vs=pl.veh.filter(v=>v.spawned&&v._pts);if(!vs.length)continue;
+    if(pl.kind==='in'&&pl.state==='humping')continue;
+    let mx=1e9,my=1e9;for(const v of vs)for(const p of v._pts){if(p[0]<mx)mx=p[0];if(p[1]<my)my=p[1];}
+    if(mx<4)mx=4;
+    const txt=plLabel(pl);const tz=TZ;TZ=1;setFont(ctx,7,600);const w=ctx.measureText(txt).width+18,h=11;
+    let x=mx,y=my-15*tz;if(pl.kind==='thru')y=my+6*tz;if(x+w*tz>1148)x=1148-w*tz;
+    const sel=selected&&selected.type==='pl'&&selected.id===pl.id;const bl=vs.some(v=>v.blocked);
+    const col=sel?C.cobalt:bl?C.red:(pl.state==='receiving'||pl.state==='assembling'||(pl.kind==='in'&&!pl.rtrack))?C.yellow:pl.kind==='thru'?'#7d8a5a':C.lime;
+    ctx.save();ctx.translate(x,y);ctx.scale(tz,tz);
+    rrect(ctx,0,0,w,h,5.5);ctx.fillStyle=sel?C.cobalt:'rgba(10,12,15,.92)';ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=.9;ctx.stroke();
+    ctx.fillStyle=sel?'#fff':col;for(let i=0;i<3;i++)ctx.fillRect(5+i*2.4,3.2,1.5,4.6);
+    label(ctx,txt,14,h/2+.3,{size:7,color:sel?'#fff':col,w:600});ctx.restore();TZ=tz;
+    hitTags.push({x,y,w:w*tz,h:h*tz,id:pl.id});}
+  // fault callout
+  if(S.faultOn){const n=FAULT_SW.node;ctx.save();ctx.translate(n.x,n.y);ctx.scale(SGZ,SGZ);ctx.rotate(Math.PI/4);ctx.fillStyle='rgba(255,75,62,.25)';ctx.fillRect(-7,-7,14,14);
+    ctx.strokeStyle=C.red;ctx.lineWidth=1.4;ctx.strokeRect(-4.5,-4.5,9,9);ctx.restore();
+    const bx=1002,by=368,bw=144,bh=90;ctx.strokeStyle=C.red;ctx.lineWidth=.9*SZ;ctx.beginPath();ctx.moveTo(n.x+6*SGZ,n.y);ctx.lineTo(bx,n.y);ctx.lineTo(bx,by);ctx.stroke();
+    const tz=TZ;TZ=1;ctx.save();ctx.translate(bx,by);ctx.scale(tz,tz);ctx.translate(-bx,-by);ctx.lineWidth=.9;
+    rrect(ctx,bx,by,bw,bh,4);ctx.fillStyle='rgba(14,17,20,.97)';ctx.fill();ctx.stroke();
+    label(ctx,'X-24',bx+8,by+11,{size:9,color:C.text,w:700});rrect(ctx,bx+bw-38,by+6,30,10,2);ctx.fillStyle=C.red;ctx.fill();label(ctx,'FAULT',bx+bw-23,by+11.3,{size:6.5,align:'center',color:'#fff',w:700});
+    const rows=[['STATE','Points not locked'],['CUT OFF','B-04…B-12, CH'],['SINCE',fmtT(S.faultT)],['STRANDED',S.qFault+' cuts'],['HUMP',faultHolding()?'Stopped · '+Math.ceil((FAULT_HOLD-(S.t-S.faultT))/60)+'m':'Reroute B-01…03 · 2 km/h']];
+    rows.forEach((r,i)=>{const yy=by+26+i*13;label(ctx,r[0],bx+8,yy,{size:6.3,color:'#69727d',ls:.5});label(ctx,r[1],bx+bw-8,yy,{size:7,align:'right',color:i===4?(faultHolding()?C.red:C.yellow):'#d5dbe1',w:600});});ctx.restore();TZ=tz;}
+}
+let TLG=null; // timeline geometry for hit-testing
+function tlSrc(){return HIST.tl||S;}
+function tlRates(){const src=tlSrc(),T=HIST.liveT,n=src.bins.length;
+  const rate=(arr,i)=>{const full=(i+1)*BIN<=T;const span=full?BIN:Math.max(60,T-i*BIN);return arr[i]*3600/span;};
+  const sm=arr=>{const out=[];for(let i=0;i<n;i++){let a=0,c=0;for(let k=Math.max(0,i-1);k<=Math.min(n-1,i+1);k++){if(k*BIN>T)continue;a+=rate(arr,k);c++;}out.push(c?a/c:0);}return out;};
+  return {n,sr:sm(src.bins),dr:sm(src.dbins),q:src.qbins,src};}
+function drawTL(){
+  const ctx=tctx,w=tlC.clientWidth,h=tlC.clientHeight;if(tlC.width!==Math.round(w*DPR)||tlC.height!==Math.round(h*DPR)){tlC.width=Math.round(w*DPR);tlC.height=Math.round(h*DPR);}ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,tlC.width,tlC.height);ctx.setTransform(DPR,0,0,DPR,0,0);
+  const WIN=6*3600,LT=HIST.liveT,end=Math.max(WIN,LT+BIN),start=end-WIN;const L=4,Rr=4,top=12,bot=15,ph=h-top-bot;const X=t=>L+(t-start)/WIN*(w-L-Rr);
+  const{n,sr,dr,q,src}=tlRates();const bands=[];
+  TLG={start,end,L,Rr,top,ph,w,h,X,T:t=>start+(t-L)/(w-L-Rr)*WIN,bands};
+  setFont(ctx,9,500);ctx.textBaseline='alphabetic';
+  for(let hh=Math.ceil(start/3600);hh*3600<=end;hh++){const x=X(hh*3600);ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillRect(x,top,1,ph);ctx.fillStyle='#4d5560';ctx.textAlign='center';ctx.fillText(p2(hh)+':00',Math.min(w-16,Math.max(16,x)),h-3);}
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(L,top+ph,w-L-Rr,1);
+  // not-yet-recorded / scrub-limit shading
+  const mt=minScrubT();if(mt>start){ctx.fillStyle='rgba(255,255,255,.025)';ctx.fillRect(L,top,X(mt)-L,ph);}
+  for(const j of src.jams){const b=j.b==null?LT:j.b;if(b<start)continue;const a=X(Math.max(start,j.a)),bb=X(b);bands.push({x0:a,x1:Math.max(a+6,bb),t:j.a,b,kind:'JAM'});
+    ctx.fillStyle='rgba(255,75,62,.15)';ctx.fillRect(a,top,Math.max(1,bb-a),ph);ctx.fillStyle='rgba(255,75,62,.8)';ctx.fillRect(a,top,Math.max(1,bb-a),1.5);
+    if(bb-a>26){setFont(ctx,8,700);ctx.fillStyle=C.red;ctx.textAlign='left';ctx.fillText('JAM',a+3,top+ph-3);}}
+  for(const f of src.faults){const b=f.b==null?LT:f.b;if(b<start)continue;const a=X(Math.max(start,f.a)),bb=X(b);bands.push({x0:a-4,x1:Math.max(a+60,bb),t:f.a,b,kind:'X-24 FAULT'});
+    ctx.save();ctx.beginPath();ctx.rect(a,top,Math.max(1,bb-a),ph);ctx.clip();ctx.strokeStyle='rgba(255,75,62,.22)';ctx.lineWidth=1;for(let x=a-ph;x<bb;x+=6){ctx.beginPath();ctx.moveTo(x,top+ph);ctx.lineTo(x+ph,top);ctx.stroke();}ctx.restore();
+    ctx.fillStyle=C.red;ctx.save();ctx.translate(a,top+1);ctx.rotate(Math.PI/4);ctx.fillRect(-3,-3,6,6);ctx.restore();ctx.fillRect(a,top,1,ph);
+    setFont(ctx,8,700);ctx.textAlign='left';ctx.fillText('X-24 FAULT',a+6,top+9);}
+  let mx=120;for(let i=0;i<n;i++)mx=Math.max(mx,sr[i]*1.15,dr[i]*1.15);
+  let mq=20;for(const v of q)mq=Math.max(mq,v);TLG.mx=mx;
+  const Y=v=>top+ph-v/mx*ph;
+  ctx.fillStyle='rgba(255,75,62,.22)';ctx.beginPath();ctx.moveTo(X(start),top+ph);for(let i=0;i<n;i++){const t=i*BIN+BIN/2;if(t<start)continue;ctx.lineTo(X(Math.min(t,LT)),top+ph-q[i]/mq*ph*.45);}ctx.lineTo(X(Math.min(LT,end)),top+ph);ctx.closePath();ctx.fill();
+  const line=(arr,col,wd,fill,dash)=>{ctx.beginPath();let first=true,lx=0;for(let i=0;i<n;i++){const t=Math.min(i*BIN+BIN/2,LT);if(t<start)continue;const x=X(t),y=Y(arr[i]);if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);lx=x;}
+    if(first)return;ctx.setLineDash(dash||[]);ctx.strokeStyle=col;ctx.lineWidth=wd;ctx.stroke();ctx.setLineDash([]);
+    if(fill){ctx.lineTo(lx,top+ph);ctx.lineTo(X(Math.max(start,BIN/2)),top+ph);ctx.closePath();const g=ctx.createLinearGradient(0,top,0,top+ph);g.addColorStop(0,'rgba(198,244,50,.22)');g.addColorStop(1,'rgba(198,244,50,0)');ctx.fillStyle=g;ctx.fill();}};
+  line(dr,'#6b7480',1.2,false,[3,3]);line(sr,C.lime,1.6,true);
+  setFont(ctx,8,500);ctx.fillStyle='#4d5560';ctx.textAlign='left';ctx.fillText(Math.round(mx)+' veh/hr',L+2,top+8);
+  const px=X(S.t);
+  if(isReplay()){const lx=X(LT);ctx.fillStyle='rgba(61,107,255,.10)';ctx.fillRect(px,top,lx-px,ph);
+    ctx.fillStyle=C.lime;ctx.fillRect(lx-.5,top-2,1.2,ph+2);setFont(ctx,7.5,700);ctx.textAlign='right';ctx.fillText('LIVE',lx-3,top+ph-3);}
+  ctx.fillStyle=C.cobalt;ctx.fillRect(px-.75,top-2,1.5,ph+2);ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.stroke();
+}
+// mini-map with viewport box (shown above 1.5x)
+function drawMini(){
+  const show=view.z>1.5;miniC.style.display=show?'block':'none';if(!show){MINI=null;return;}
+  const ctx=nctx,w=210,h=100,pad=6;const k=Math.min((w-2*pad)/(WB.x1-WB.x0),(h-2*pad)/(WB.y1-WB.y0));
+  const ox=(w-(WB.x1-WB.x0)*k)/2-WB.x0*k,oy=(h-(WB.y1-WB.y0)*k)/2-WB.y0*k;MINI={k,ox,oy};
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,w,h);ctx.fillStyle='rgba(10,12,15,.92)';ctx.fillRect(0,0,w,h);
+  ctx.setTransform(DPR*k,0,0,DPR*k,DPR*ox,DPR*oy);
+  for(const e of EL){ctx.strokeStyle=e.kind==='main'?'#6b737d':e.kind==='charge'?'rgba(245,197,66,.5)':'#3a414a';ctx.lineWidth=1.2/k*.8;strokePts(ctx,e.pts);}
+  for(const v of S.veh){const e=EDGES[v.route[v.ri]];const p=pointAt(e,v.s-v.len/2);ctx.fillStyle=v.blocked&&!v.thru?C.red:socColor(v.soc);ctx.fillRect(p[0]-3,p[1]-3,6,6);}
+  if(S.faultOn){const n=FAULT_SW.node;ctx.fillStyle=C.red;ctx.beginPath();ctx.arc(n.x,n.y,7,0,7);ctx.fill();}
+  const[a,b]=S2W(0,0),[c,d]=S2W(VW,VH);ctx.fillStyle='rgba(61,107,255,.12)';ctx.fillRect(a,b,c-a,d-b);ctx.strokeStyle=C.cobalt;ctx.lineWidth=1.5/k;ctx.strokeRect(a,b,c-a,d-b);
+}
+// ---------------- UI
+const $=id=>document.getElementById(id);
+let lastPv=0,running=false,speed=4,acc=0,last=performance.now(),frameN=0;
+const RULES={dest:'One destination block per bowl track. Clean outbound platoons, but blocks wait to fill.',
+  soc:'Bowl tracks banded by battery level, and low-SoC platoons hump first. Energy-matched platoons with mixed blocks.',
+  fifo:'Fill tracks in arrival order. Fastest hump, but outbound platoons carry mixed blocks.'};
+const SL=[['rate','i-rate',v=>v+' /hr'],['hump','i-hump',v=>(+v).toFixed(1)+' km/h'],['size','i-size',v=>v+' veh'],['socThr','i-soc',v=>v+'%']];
+function syncInputs(){
+  for(const[k,id,f] of SL){const el=$(id);el.value=P[k];paintSlider(el);$('o-'+id.slice(2)).textContent=f(P[k]);}
+  $('n-rate').textContent='≈ '+P.rate*P.size+' veh/hr';
+  $('chgToggle').classList.toggle('on',P.chargeOn);
+  document.querySelectorAll('#ruleSeg button').forEach(b=>b.classList.toggle('on',b.dataset.r===P.rule));
+  $('ruleDesc').textContent=RULES[P.rule];
+  const n=Object.keys(DEF).filter(k=>P[k]!==DEF[k]).length;$('chgK').textContent='SIM VARIABLES · '+(n?n+' CHANGED · LIVE':'LIVE');
+}
+function paintSlider(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--p',p+'%');}
+// any variable change while replaying branches the timeline there (future history discarded)
+function setParam(fn){branch();fn();takeSnap();logEvt();syncInputs();refresh(true);}
+for(const[k,id] of SL){$(id).addEventListener('input',e=>{const v=+e.target.value;setParam(()=>{P[k]=v;});});}
+$('chgToggle').onclick=()=>setParam(()=>{P.chargeOn=!P.chargeOn;});
+document.querySelectorAll('#ruleSeg button').forEach(b=>b.onclick=()=>setParam(()=>{P.rule=b.dataset.r;}));
+$('defaultsBtn').onclick=()=>setParam(()=>{Object.assign(P,DEF);});
+function setRunning(on){running=on;$('play').classList.toggle('idle',!on);
+  $('playIco').innerHTML=on?'<rect x="4" y="3" width="3.6" height="12" rx=".8" fill="currentColor"/><rect x="10.4" y="3" width="3.6" height="12" rx=".8" fill="currentColor"/>':'<path d="M5 3.2v11.6L14.5 9z" fill="currentColor"/>';
+  last=performance.now();if(typeof refresh==='function')refresh(true);}
+$('play').onclick=()=>setRunning(!running);
+$('stepBtn').onclick=()=>{setRunning(false);advance(60);refresh(true);};
+document.querySelectorAll('#speedSeg button').forEach(b=>b.onclick=()=>{speed=+b.dataset.s;document.querySelectorAll('#speedSeg button').forEach(x=>x.classList.toggle('on',x===b));refresh(true);});
+$('resetBtn').onclick=()=>{reset();};
+$('faultBtn').onclick=()=>{branch();setFault(!S.faultOn);takeSnap();logEvt();updateFaultUI();refresh(true);};
+document.querySelectorAll('.layers button').forEach(b=>b.onclick=()=>{LAYERS[b.dataset.l]=!LAYERS[b.dataset.l];b.classList.toggle('on',LAYERS[b.dataset.l]);staticDirty=true;});
+window.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'&&e.target.type!=='range')return;if(e.metaKey||e.ctrlKey)return;
+  if(e.code==='Space'){e.preventDefault();setRunning(!running);}
+  else if(e.key==='ArrowLeft'){e.preventDefault();uiSeek(S.t-60);}
+  else if(e.key==='ArrowRight'){e.preventDefault();if(isReplay())uiSeek(S.t+60);else{advance(60);refresh(true);}}
+  else if(e.key==='+'||e.key==='='){zoomTo(view.z*1.25);}else if(e.key==='-'||e.key==='_'){zoomTo(view.z/1.25);}else if(e.key==='0'){fitView();}
+  else if(e.key==='.'){setRunning(false);advance(60);refresh(true);}else if(e.key==='Escape'){selected=null;refresh(true);}});
+function updateFaultUI(){const on=S.faultOn;$('faultCard').classList.toggle('on',on);$('faultBtn').textContent=on?'Clear fault':'Trigger fault';
+  const pill=$('faultPill');pill.textContent=on?'FAULT':'NOMINAL';pill.style.background=on?'var(--red)':'#1d2228';pill.style.color=on?'#fff':'var(--muted)';
+  $('faultSub').textContent=on?'Points failed to lock at '+fmtT(S.faultT)+'. B-04…B-12 and CH-01/02 are cut off. Hump stops 25 min for inspection, then reroutes into B-01…B-03 (mixed overflow) at 2 km/h.':'Bowl ladder · B-04 branch. Failing it cuts off B-04…B-12 and the charging spurs.';}
+// map: click select, drag pan, wheel/pinch zoom, double-click zoom
+function hitAt(sx,sy){const[wx,wy]=S2W(sx,sy);
+  for(const t of hitTags)if(wx>=t.x&&wx<=t.x+t.w&&wy>=t.y&&wy<=t.y+t.h)return {type:'pl',id:t.id};
+  let best=null,bd=Math.max(7/K,3.2*VZ);for(const v of S.veh){if(!v._pts)continue;for(let i=1;i<v._pts.length;i++){const d=segDist(wx,wy,v._pts[i-1],v._pts[i]);if(d<bd){bd=d;best=v;}}}
+  return best?{type:'veh',id:best.id}:null;}
+const ptrs=new Map();let drag=null,pinch=null;
+function mxy(e){const r=mapC.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+mapC.addEventListener('pointerdown',e=>{mapC.setPointerCapture(e.pointerId);const p=mxy(e);ptrs.set(e.pointerId,p);
+  if(ptrs.size===1)drag={x:p[0],y:p[1],sx:p[0],sy:p[1],moved:false};
+  else if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),z:view.z};drag=null;}});
+mapC.addEventListener('pointermove',e=>{const p=mxy(e);
+  if(ptrs.has(e.pointerId)){ptrs.set(e.pointerId,p);
+    if(pinch&&ptrs.size===2){const[a,b]=[...ptrs.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoomAt(pinch.z*d/pinch.d/view.z,(a[0]+b[0])/2,(a[1]+b[1])/2);return;}
+    if(drag){if(!drag.moved&&Math.hypot(p[0]-drag.sx,p[1]-drag.sy)>3)drag.moved=true;if(drag.moved){panBy(p[0]-drag.x,p[1]-drag.y);mapC.style.cursor='grabbing';}drag.x=p[0];drag.y=p[1];}
+    return;}
+  mapC.style.cursor=hitAt(p[0],p[1])?'pointer':'grab';});
+function endPtr(e){const had=ptrs.has(e.pointerId);ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;
+  if(had&&drag&&!drag.moved&&e.type==='pointerup'){const p=mxy(e);selected=hitAt(p[0],p[1]);refresh(true);}
+  if(ptrs.size===0){drag=null;mapC.style.cursor='grab';}}
+mapC.addEventListener('pointerup',endPtr);mapC.addEventListener('pointercancel',endPtr);
+mapC.addEventListener('wheel',e=>{e.preventDefault();const p=mxy(e);const dy=e.deltaMode===1?e.deltaY*16:e.deltaY;zoomAt(Math.exp(-dy*(e.ctrlKey?0.01:0.0015)),p[0],p[1]);},{passive:false});
+mapC.addEventListener('dblclick',e=>{const p=mxy(e);zoomAt(1.6,p[0],p[1]);});
+$('zIn').onclick=()=>zoomTo(view.z*1.25);$('zOut').onclick=()=>zoomTo(view.z/1.25);$('zFit').onclick=()=>fitView();
+miniC.addEventListener('pointerdown',e=>{if(!MINI)return;const r=miniC.getBoundingClientRect();centerOn((e.clientX-r.left-MINI.ox)/MINI.k,(e.clientY-r.top-MINI.oy)/MINI.k);});
+// timeline: click/drag to scrub, hover tooltip, band labels jump to the band start
+const zPctEl=$('zPct');
+function uiSeek(t){seek(t);syncInputs();updateFaultUI();refresh(true);}
+let tlDrag=null;
+function tlXY(e){const r=tlC.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+function bandAt(x,y){if(!TLG||y>TLG.top+14)return null;for(const b of TLG.bands)if(x>=b.x0&&x<=b.x1)return b;return null;}
+tlC.addEventListener('pointerdown',e=>{if(!TLG)return;tlC.setPointerCapture(e.pointerId);const[x,y]=tlXY(e);
+  tlDrag={was:running};setRunning(false);const b=bandAt(x,y);uiSeek(b?b.t:TLG.T(x));if(b)tlDrag.band=true;});
+tlC.addEventListener('pointermove',e=>{if(!TLG)return;const[x,y]=tlXY(e);
+  if(tlDrag&&!tlDrag.band){uiSeek(TLG.T(x));}
+  const tip=$('tltip');const t=clamp(TLG.T(x),TLG.start,TLG.end);const b=bandAt(x,y);
+  if(t>HIST.liveT+1){tip.style.display='none';return;}
+  const{sr,q}=tlRates();const i=Math.min(sr.length-1,Math.max(0,Math.floor(t/BIN)));
+  tip.innerHTML=b?`<b style="color:var(--red)">${b.kind}</b> ${fmtT(b.t).slice(0,7)} → ${fmtT(b.b).slice(2,7)}<br><span class="k">click to jump to start</span>`:
+    `<b>${fmtT(t).slice(0,7)}</b>${t<minScrubT()?' <span class="k">(outside history)</span>':''}<br><span class="k">sorted</span> ${Math.round(sr[i]||0)} veh/hr · <span class="k">queue</span> ${q[i]||0}`;
+  tip.style.display='block';tip.style.left=clamp(x,60,TLG.w-60)+'px';tip.style.top=(TLG.top-4)+'px';});
+function tlUp(){if(tlDrag){const w=tlDrag.was;tlDrag=null;if(w)setRunning(true);}}
+tlC.addEventListener('pointerup',tlUp);tlC.addEventListener('pointercancel',tlUp);
+tlC.addEventListener('pointerleave',()=>{$('tltip').style.display='none';});
+$('liveBtn').onclick=()=>{if(isReplay())uiSeek(HIST.liveT);};$('rbGo').onclick=()=>uiSeek(HIST.liveT);
+function segDist(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*dy;let t=l?((x-a[0])*dx+(y-a[1])*dy)/l:0;t=clamp(t,0,1);return Math.hypot(x-a[0]-t*dx,y-a[1]-t*dy);}
+const STATE_TXT={inbound:'Inbound · ML1',receiving:'Receiving',humping:'Humping',rolling:'Rolling',classified:'Classified · awaiting pull',charging:'Charging',pulling:'Pulling to departure',assembling:'Assembling',departing:'Departing',through:'Through · ML2'};
+function vehState(v){if(v.state==='inbound'&&v.blocked)return['HOLD X-01','red'];if(v.state==='rolling'&&!v.target)return['STRANDED','red'];
+  if(v.blocked)return['QUEUED','red'];if(v.state==='charging')return['CHARGING','yellow'];if(v.state==='receiving'||v.state==='assembling'||v.state==='classified')return['HOLDING','yellow'];return['MOVING','lime'];}
+function pill(t,c){const bg={red:'var(--red)',yellow:'rgba(245,197,66,.16)',lime:'rgba(198,244,50,.14)',cobalt:'var(--cobalt)'}[c];const fg={red:'#fff',yellow:'var(--yellow)',lime:'var(--lime)',cobalt:'#fff'}[c];return `<span class="dz-pill" style="background:${bg};color:${fg}">${t}</span>`;}
+function socHTML(s){return `<span><span class="socbar"><i style="width:${s}%;background:${socColor(s)}"></i></span>${Math.round(s)}%</span>`;}
+function row(k,v){return `<div class="dz-row"><span>${k}</span><span>${v}</span></div>`;}
+function renderDossier(){const dz=$('dossier');
+  if(selected&&selected.type==='veh'){const v=S.veh.find(x=>x.id===selected.id)||S.pending.find(x=>x.id===selected.id);
+    if(!v){selected=null;}else{const[st,c]=vehState(v);const e=v.spawned?EDGES[v.route[v.ri]]:null;
+      let tgt=v.target?v.target.id:v.state==='pulling'||v.state==='assembling'?(S.pl[v.platoon]&&S.pl[v.platoon].dtrack?EDGES[S.pl[v.platoon].dtrack].track:'—'):v.state==='departing'?'ML2 W':'—';
+      dz.className='sel';dz.innerHTML=`<div class="dz-k">VEHICLE · DOSSIER</div><div class="dz-head"><span class="dz-id">${v.id}</span>${pill(st,c)}</div>`+
+        row('SoC',socHTML(v.soc))+row('DEST BLOCK',v.thru?'Through':`${v.block} · ${BLOCKNAME[v.block]}`)+row('TRACK',e?e.track:'Off-map · ML1')+
+        row('STATE',STATE_TXT[v.state]+(v.state==='rolling'&&v.target?' → '+v.target.id:''))+row('ASSIGNED',tgt)+row('PLATOON',v.platoon||'— cut')+
+        (v.thru?'':row('DWELL',((S.t-v.spawnT)/60).toFixed(0)+' min'));return;}}
+  if(selected&&selected.type==='pl'){const pl=S.pl[selected.id];
+    if(!pl){selected=null;}else{const vs=pl.veh;const soc=vs.reduce((a,v)=>a+v.soc,0)/Math.max(1,vs.length);const bl=vs.some(v=>v.blocked);
+      const blocks=pl.kind==='thru'?'Through':pl.kind==='out'?(pl.relay?'Relay · charged':pl.dom+' · '+BLOCKNAME[pl.dom]):[...new Set(vs.map(v=>v.block))].join(' ');
+      const tr=vs.find(v=>v.spawned);const st=bl?['QUEUED','red']:(pl.state==='receiving'||pl.state==='assembling')?['HOLDING','yellow']:['MOVING','lime'];
+      dz.className='sel';dz.innerHTML=`<div class="dz-k">PLATOON · ${pl.kind==='in'?'INBOUND':pl.kind==='out'?'OUTBOUND':'THROUGH'}</div><div class="dz-head"><span class="dz-id">${pl.id} <span style="color:var(--muted);font-size:12px">×${vs.length}</span></span>${pill(st[0],st[1])}</div>`+
+        row('AVG SoC',socHTML(soc))+row(pl.kind==='in'?'BLOCKS':'DEST BLOCK',blocks)+row('TRACK',tr?EDGES[tr.route[tr.ri]].track:'Off-map · ML1')+
+        row('STATE',plLabel(pl).replace(pl.id,'').replace(/^ ×\d+ ?/,'')||pl.state)+row('COUPLERS','0 · virtual link')+
+        `<div class="dz-chips">${vs.map(v=>`<i title="${v.id}" style="background:${socColor(v.soc)}"></i>`).join('')}</div>`;return;}}
+  dz.className='';dz.innerHTML=`<div class="dz-k">DOSSIER</div><div class="dz-empty" style="margin-top:6px">Click a vehicle or a platoon tag on the map to inspect its ID, SoC, destination block, track and state.</div>`;
+}
+function refresh(force){
+  $('hdrTime').textContent=$('clock').textContent=fmtT(S.t);
+  const dep=S.departed;const avg=dep.length?dep.reduce((a,d)=>a+d.dwell,0)/dep.length/60:null;const on=dep.length?dep.filter(d=>d.ok).length/dep.length*100:null;
+  const tone=(id,c)=>{$(id).style.background=`var(--${c})`;};
+  $('v-dwell').textContent=avg==null?'—':avg.toFixed(1);tone('d-dwell',avg==null?'lime':avg<=75?'lime':avg<=110?'yellow':'red');
+  $('s-dwell').innerHTML=avg==null?'no departures yet':`<span class="${avg<=75?'c-lime':avg<=110?'c-yellow':'c-red'}">${avg<=75?'within':'over'} 75 min target</span> · n=${dep.length}`;
+  $('v-ontime').textContent=on==null?'—':on.toFixed(0);tone('d-ontime',on==null?'lime':on>=85?'lime':on>=60?'yellow':'red');
+  $('s-ontime').textContent='right block, ≤ 75 min dwell';
+  $('v-proc').textContent=S.processed;tone('d-proc','lime');
+  const lastHr=S.departed.filter(d=>d.t>S.t-3600).length;$('s-proc').innerHTML=`<span class="c-lime">+${lastHr} last hr</span> · ${S.sorted} humped`;
+  $('v-queue').textContent=S.queue;tone('d-queue',S.queue<5?'lime':S.queue<10?'yellow':'red');
+  $('s-queue').innerHTML=`<span class="${S.queue>=10?'c-red':''}">ML1 ${S.qML} · hump ${S.qHump} · fault ${S.qFault}${S.diverted?' · diverted '+S.diverted:''}</span>`;
+  const sc=$('statusChip');
+  if(S.faultOn){sc.className='schip bad';sc.textContent='X-24 FAULT';}else if(S.jamOn){sc.className='schip bad';sc.textContent='JAM · QUEUE '+S.queue;}
+  else if(S.queue>=5||S.crestHold){sc.className='schip warn';sc.textContent=S.crestHold?'HUMP HOLD':'CONGESTED';}else{sc.className='schip ok';sc.textContent='FLOWING';}
+  if(HIST.pv!==lastPv){lastPv=HIST.pv;syncInputs();updateFaultUI();}
+  const rp=isReplay();$('replayBar').style.display=rp?'flex':'none';
+  if(rp){$('rbT').textContent=fmtT(S.t).slice(0,7);$('rbLive').textContent='live '+fmtT(HIST.liveT).slice(0,7);}
+  const lc=$('liveChip');lc.classList.toggle('replay',rp);lc.classList.toggle('on',!rp&&running);$('liveTxt').textContent=rp?'REPLAY '+fmtT(S.t).slice(0,7)+(running?' · '+speed+'×':''):running?'LIVE · '+speed+'×':'PAUSED';
+  const lb=$('liveBtn');lb.className=rp?'go':'on';lb.innerHTML=rp?'<i></i>GO LIVE ▸▸':'<i></i>LIVE';
+  $('zPct').textContent=Math.round(view.z*100)+'%';
+  renderDossier();drawTL();
+}
+function frame(now){const dtr=Math.min(0.1,(now-last)/1000);last=now;
+  if(running){acc+=dtr*SIM_PER_SEC*speed;let n=0;while(acc>=DT&&n<240){step();acc-=DT;n++;}if(n>=240)acc=0;}
+  draw();drawMini();zPctEl.textContent=Math.round(view.z*100)+'%';if(++frameN%8===0)refresh();requestAnimationFrame(frame);}
+function reset(){newState();advance(90*60);selected=null;setRunning(false);updateFaultUI();refresh(true);}
+window.addEventListener('resize',()=>{resize();refresh(true);});
+syncInputs();newState();advance(90*60);resize();updateFaultUI();refresh(true);requestAnimationFrame(frame);
+// test hooks
+window.__yard={get S(){return S;},P,advance:s=>{advance(s);refresh(true);},setFault:on=>{branch();setFault(on);takeSnap();logEvt();updateFaultUI();refresh(true);},
+  play:()=>setRunning(true),pause:()=>setRunning(false),get running(){return running;},select:id=>{selected={type:'veh',id};refresh(true);},
+  selectPl:id=>{selected={type:'pl',id};refresh(true);},
+  vehScreen:id=>{const v=S.veh.find(x=>x.id===id);if(!v||!v._pts)return null;const p=v._pts[Math.floor(v._pts.length/2)];const r=mapC.getBoundingClientRect();const q=W2S(p[0],p[1]);return [q[0]+r.left,q[1]+r.top];},
+  get selected(){return selected;},seek:t=>uiSeek(t),get liveT(){return HIST.liveT;},isReplay:()=>isReplay(),snaps:()=>SNAPS.length,minT:()=>minScrubT(),
+  hash:()=>stateHash(),view,zoomAt:(f,x,y)=>{zoomAt(f,x,y);},zoomTo:z=>zoomTo(z),centerOn:(x,y)=>centerOn(x,y),fit:()=>fitView(),
+  setParam:(k,v)=>setParam(()=>{P[k]=v;}),toggleFault:()=>$('faultBtn').click(),w2s:(x,y)=>{const r=mapC.getBoundingClientRect();const q=W2S(x,y);return [q[0]+r.left,q[1]+r.top];},
+  tlX:t=>{const r=tlC.getBoundingClientRect();return [r.left+TLG.X(t),r.top+TLG.top+TLG.ph*0.6];},TLG:()=>TLG,refresh:()=>refresh(true),TRACKS};
+})();
+</script>
+</body></html>

@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1440,height:900}});
+p.on('pageerror',e=>console.log('E',e.message));
+const load=async()=>{await p.goto('file:///workspace/yard-sim/v2/index.html');await p.waitForTimeout(700);await p.click('#viewSeg button[data-v="asm"]');await p.waitForTimeout(200);await p.mouse.move(5,890);};
+const D='/workspace/yard-sim/v2/shots/';
+await load();await p.screenshot({path:D+'after-11-assembly.png'});
+await p.click('.car[data-car="PV-0611"]');for(let i=0;i<6;i++)await p.click('#cedit [data-es="-0.5"]');await p.mouse.move(5,890);await p.waitForTimeout(100);await p.screenshot({path:D+'after-11-cargo-editor.png'});
+await load();await p.evaluate(()=>{const A=__asm;A.applySuggested();for(const x of A.autoAssign(A.plan()).placed)A.assign(x.shp.id,x.car);A.send();__yard.advance(12*60);A.render();});
+await p.waitForTimeout(150);await p.screenshot({path:D+'after-11-sent-to-yard.png'});
+await p.click('#viewSeg button[data-v="yard"]');await p.waitForTimeout(300);await p.screenshot({path:'/tmp/yard-sent.png'});
+await b.close();})();

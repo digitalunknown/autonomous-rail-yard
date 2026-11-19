@@ -1,0 +1,87 @@
+<body>
+<div id="app">
+<header>
+  <div class="product">Yard Control</div><div class="org">Blockline</div>
+  <div class="grow"></div>
+  <div class="prov">Simulated data, not live telemetry</div>
+  <div class="live" id="liveChip"><i></i><span id="liveTxt">PAUSED</span></div>
+</header>
+<main id="left">
+  <section id="outcomes" aria-label="Outcomes">
+    <div class="tiles">
+      <div class="tile"><div class="tt"><i class="dot" id="d-dwell"></i>Avg dwell</div><div class="val"><b id="v-dwell">—</b><small>min</small></div><div class="sub" id="s-dwell">target ≤ 75 min</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-ontime"></i>On-time sort</div><div class="val"><b id="v-ontime">—</b><small>%</small></div><div class="sub" id="s-ontime">right block, ≤ 75 min</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-proc"></i>Processed</div><div class="val"><b id="v-proc">0</b><small>veh</small></div><div class="sub" id="s-proc">—</div></div>
+      <div class="tile"><div class="tt"><i class="dot" id="d-queue"></i>Queue</div><div class="val"><b id="v-queue">0</b><small>veh</small></div><div class="sub" id="s-queue">—</div></div>
+    </div>
+  </section>
+  <section id="mapwrap">
+    <div class="map-head">
+      <div><div class="map-title">Kestrel Flats hump yard <span id="statusChip" class="schip ok">FLOWING</span></div>
+      <div class="map-dock"><div class="map-sub">12 bowl tracks · 4 receiving · 3 departure · schematic</div>
+        <div id="pickBar" class="dock" role="status"><i class="dk-dot"></i><b>Pick mode</b><span id="pickTxt">Click a turnout, track, charger, crest or vehicle</span><button id="pickDone">Done</button></div>
+        <div id="replayBar" class="dock" role="status"><span class="rb-k">Replay</span><b id="rbT">T+00:00</b><span id="rbLive"></span><button id="rbGo">Go live</button></div></div></div>
+      <div class="layers" role="group" aria-label="Map layers"><button data-l="routes" class="on" aria-pressed="true">Routes</button><button data-l="signals" class="on" aria-pressed="true">Signals</button><button data-l="ids" class="on" aria-pressed="true">IDs</button><button data-l="tags" class="on" aria-pressed="true">Tags</button></div>
+    </div>
+    <div id="mapbox"><canvas id="map" aria-label="Yard map"></canvas>
+      <div id="zoomctl"><button id="zOut" title="Zoom out (−)" aria-label="Zoom out">−</button><span id="zPct">100%</span><button id="zIn" title="Zoom in (+)" aria-label="Zoom in">+</button><button id="zFit" title="Fit (0)">Fit</button></div>
+      <canvas id="mini" title="Click to jump"></canvas>
+      <div id="dossier"></div>
+      <div id="fpop" role="dialog" aria-label="Inject fault"></div>
+
+      <div id="legendWrap">
+        <div id="legend" role="region" aria-label="Map legend">
+          <span class="lh">Track</span><span class="lh">Vehicle</span><span class="lh">State</span>
+          <span><em style="background:#8b939d"></em>Main line</span><span><b style="background:var(--lime)"></b>Moving</span><span><em style="background:var(--lime)"></em>Flowing</span>
+          <span><em style="background:#4a525c"></em>Yard / bowl</span><span><b style="background:#aab3bd"></b>Standing</span><span><b class="halo" style="background:#aab3bd"></b>Jam / blocked</span>
+          <span><em class="dash"></em>Charging spur</span><span><b style="background:var(--yellow)"></b>Low SoC</span><span><b style="background:var(--cobalt)"></b>Selected</span>
+        </div>
+        <button id="legendBtn" aria-expanded="false" aria-controls="legend" title="Legend (hover, or click to pin)"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="2" width="3" height="2" rx=".5" fill="currentColor"/><rect x="5.5" y="2.5" width="5.5" height="1" fill="currentColor"/><rect x="1" y="5" width="3" height="2" rx=".5" fill="currentColor"/><rect x="5.5" y="5.5" width="5.5" height="1" fill="currentColor"/><rect x="1" y="8" width="3" height="2" rx=".5" fill="currentColor"/><rect x="5.5" y="8.5" width="5.5" height="1" fill="currentColor"/></svg>Legend</button>
+      </div>
+    </div>
+  </section>
+  <section id="bottom">
+    <div class="transport">
+      <div class="trow">
+        <button id="play" class="idle" title="Play / pause (Space)" aria-label="Play"><svg id="playIco" width="18" height="18" viewBox="0 0 18 18"><path d="M5 3.2v11.6L14.5 9z" fill="currentColor"/></svg></button>
+        <button class="cbtn" id="stepBtn" title="Step +1 sim-min (.)" aria-label="Step one minute"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 2.5v9L9 7z" fill="currentColor"/><rect x="10" y="2.5" width="1.6" height="9" fill="currentColor"/></svg></button>
+        <div class="clock"><div class="k">Run 01 · playhead</div><div class="t" id="clock">T+00:00:00</div></div>
+      </div>
+      <div class="trow"><div class="seg" id="speedSeg" role="group" aria-label="Speed"><button data-s="1">1×</button><button data-s="4" class="on">4×</button><button data-s="16">16×</button></div>
+        <button class="rbtn" id="resetBtn" title="Reset the run">Reset</button></div>
+    </div>
+    <div class="tl"><div class="tl-head"><span class="tlh-l"><b>Throughput · 6 h</b><button id="liveBtn" class="on"><i></i>LIVE</button><span class="hint">Drag to scrub</span></span><span class="lg"><span><i style="background:var(--fg)"></i>Sorted</span><span><i class="dash"></i>Departed</span><span><i class="sq" style="background:rgba(255,255,255,.14)"></i>Queue</span><span><i class="sq" style="background:rgba(255,75,62,.45)"></i>Jam</span><span><i class="dia" style="background:var(--red)"></i>Fault</span><span><i style="background:var(--cobalt)"></i>Playhead</span></span></div><div class="tlbox"><canvas id="tl" aria-label="Throughput timeline"></canvas><div id="tltip"></div></div></div>
+  </section>
+</main>
+<aside aria-label="Simulation variables">
+  <div class="ph"><div class="row"><h2>Variables</h2><button id="defaultsBtn">Defaults</button></div><div class="k" id="chgK">Run 01 · all defaults</div></div>
+  <div class="grp" id="faultsGrp"><div class="k fk"><span>Faults <span id="fCount" class="fcount">none</span></span><span class="fk-r"><button id="fPick" aria-pressed="false" title="Click an element on the map to fault it (or right-click the map)">Pick on map</button><button id="fClearAll" disabled>Clear all</button></span></div>
+    <div class="fadd">
+      <label class="fsel"><span>Type</span><select id="fType" aria-label="Fault type"><option value="turnout">Turnout stuck</option><option value="retarder">Retarder failure</option><option value="charger">Charger outage</option><option value="battery">Battery drop</option><option value="track">Track blocked</option></select></label>
+      <label class="fsel"><span>Target</span><select id="fTarget" aria-label="Fault target"></select></label>
+      <label class="fsel"><span>Clears</span><select id="fDur" aria-label="Fault duration"><option value="0">Manually</option><option value="900">After 15 min</option><option value="1800">After 30 min</option><option value="3600">After 60 min</option></select></label>
+      <button id="fInject" class="finj">Inject</button>
+    </div>
+    <div class="fhint" id="fHint"></div>
+    <div id="fList" role="list" aria-label="Active faults"></div>
+    <div class="fault fpre" id="faultCard"><div class="fh"><span>X-24 preset</span><span id="faultPill">Nominal</span></div>
+    <button class="fbtn" id="faultBtn">Trigger fault</button>
+    <div class="fs" id="faultSub">Bowl ladder, B-04 branch. Failing it cuts off B-04…B-12 and the charging spurs.</div></div>
+  </div>
+  <div class="grp"><div class="k">Flow</div>
+    <div class="var"><div class="vh"><label for="i-rate">Arrival rate</label><b id="o-rate"></b></div><input type="range" id="i-rate" min="2" max="30" step="1"><div class="vr"><span>2</span><span id="n-rate"></span><span>30</span></div></div>
+    <div class="var"><div class="vh"><label for="i-hump">Hump speed</label><b id="o-hump"></b></div><input type="range" id="i-hump" min="1" max="8" step="0.5"><div class="vr"><span>1 km/h</span><span>8 km/h</span></div></div>
+  </div>
+  <div class="grp"><div class="k">Platooning</div>
+    <div class="var"><div class="vh"><label for="i-size">Platoon size</label><b id="o-size"></b></div><input type="range" id="i-size" min="2" max="12" step="1"><div class="vr"><span>2</span><span>inbound + outbound</span><span>12</span></div></div>
+  </div>
+  <div class="grp"><div class="k">Energy</div>
+    <div class="var"><div class="vh"><label for="i-soc">SoC charge threshold</label><b id="o-soc"></b></div><input type="range" id="i-soc" min="0" max="60" step="5"><div class="vr"><span>0%</span><span>below → CH-01/02</span><span>60%</span></div></div>
+    <div class="toggle"><span>Opportunity charging</span><button class="sw on" id="chgToggle" role="switch" aria-checked="true" aria-label="Opportunity charging"></button></div>
+  </div>
+  <div class="grp"><div class="k">Sort rule</div>
+    <div class="seg rule" id="ruleSeg" role="group" aria-label="Sort rule"><button data-r="dest" class="on">Destination</button><button data-r="soc">SoC</button><button data-r="fifo">FIFO</button></div>
+    <div class="rdesc" id="ruleDesc"></div>
+  </div>
+</aside>
+</div>

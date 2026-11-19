@@ -1,0 +1,32 @@
+const pg=figma.root.children.find(p=>p.id==='165:1523');await figma.setCurrentPageAsync(pg);
+const RAIL='189:1465';
+const dotC={Ready:'flow',Charging:'live',Fault:'jam',Pending:'text/disabled'};
+const brow=$fig.variants({name:'asm/Board row'},Object.keys(dotC).map(s=>$fig.component({name:'State='+s,layoutMode:'HORIZONTAL',width:160,layoutSizingHorizontal:'FIXED',itemSpacing:N('s2'),counterAxisAlignItems:'MIN',...P(0,0,6,6),strokes:F('line/subtle'),strokeWeight:1,strokeAlign:'INSIDE'},[$fig.autoLayout({name:'Dot wrap',height:16,layoutSizingVertical:'FIXED',counterAxisAlignItems:'CENTER'},[$fig.ellipse({name:'Dot',width:6,height:6,fills:F(dotC[s])})]),$fig.autoLayout({name:'Text',layoutMode:'VERTICAL',itemSpacing:0,layoutGrow:1},[$fig.autoLayout({name:'Line',layoutSizingHorizontal:'FILL'},[T('PV-0471','ds','text/primary').textProp('ID'),sp(),T('82%','data',s==='Charging'?'live':'text/secondary').textProp('SoC')]),T('Box \u00b7 B-03','meta',s==='Fault'?'jam':s==='Charging'?'live':'text/muted',{layoutSizingHorizontal:'FILL',textAutoResize:'HEIGHT'}).textProp('Meta')])])));
+$fig.get('188:1463').append(brow);
+const br=(s,id,soc,meta)=>$fig.instance(brow,{props:{State:s,ID:id,SoC:soc,Meta:meta},layoutSizingHorizontal:'FILL'});
+const ready=(n,c,p,f)=>{const tot=n+c+p+f;const seg=(k,col)=>k?[$fig.rectangle({name:col,width:Math.max(2,Math.round(160*k/tot)-2),height:4,fills:F(col)})]:[];return $fig.autoLayout({name:'Readiness',itemSpacing:2},[...seg(n,'flow'),...seg(c,'live'),...seg(f,'jam'),...seg(p,'line/strong')]);};
+const group=(pl,meta,rdy,rows,sel,more)=>$fig.autoLayout({name:'Group '+pl,layoutMode:'VERTICAL',itemSpacing:N('s2'),layoutSizingHorizontal:'FILL',...(sel?{strokes:F('sel'),strokeWeight:2,...P(N('s2'),0,0,0)}:{})},[$fig.autoLayout({name:'Head',layoutSizingHorizontal:'FILL',counterAxisAlignItems:'CENTER'},[T(pl,'ds','text/primary'),sp(),T(meta,'label','text/muted')]),rdy,...rows,...(more?[T(more,'meta','text/muted')]:[])]);
+const col=(code,sub,groups)=>$fig.autoLayout({name:'Column '+code,layoutMode:'VERTICAL',itemSpacing:N('s4'),width:172,layoutSizingHorizontal:'FIXED',layoutSizingVertical:'FILL',...P(N('s3'),N('s3'),N('s4'),N('s4')),strokes:F('line/subtle'),strokeWeight:1},[$fig.autoLayout({name:'Col head',layoutMode:'VERTICAL',itemSpacing:2},[T(code,'h','text/primary'),T(sub,'meta','text/muted')]),...groups]);
+const cols=[
+ col('STL','St. Louis \u00b7 1 platoon',[group('PL-52','D-02 14:20',ready(4,0,0,1),[br('Ready','PV-0471','82%','Box \u00b7 B-03 \u00b7 #1'),br('Ready','PV-0488','76%','Box \u00b7 B-03 \u00b7 #2'),br('Ready','PV-0512','64%','Hopper \u00b7 B-03 \u00b7 #3'),br('Fault','PV-0618','71%','MEM vehicle at #4, inside STL'),br('Ready','PV-0526','58%','Tank \u00b7 B-03 \u00b7 #5')],true)]),
+ col('MEM','Memphis \u00b7 1 platoon',[group('PL-52','D-02 14:20',ready(5,1,0,2),[br('Fault','PV-0618','71%','Out of block order \u00b7 #4'),br('Charging','PV-0533','18%','Below 25% floor \u00b7 CH-01 \u224814:04'),br('Ready','PV-0590','69%','Flat \u00b7 B-08'),br('Ready','PV-0597','73%','Flat \u00b7 B-08'),br('Ready','PV-0604','88%','Box \u00b7 B-08'),br('Ready','PV-0611','61%','Hopper \u00b7 B-09'),br('Ready','PV-0625','79%','Reefer \u00b7 B-09'),br('Fault','PV-0702','66%','Past D-02 limit \u00b7 #12')],true)]),
+ col('CHI','Chicago \u00b7 2 platoons',[group('PL-49','D-01 13:55',ready(10,0,0,0),[br('Ready','PV-0402','84%','Box \u00b7 D-01'),br('Ready','PV-0409','77%','Box \u00b7 D-01')],false,'+8 ready \u00b7 departs in 13 min'),group('PL-54','D-02 15:35',ready(0,0,9,0),[br('Pending','\u2014','','Draft \u00b7 9 slots open')],false)]),
+ col('KCY','Kansas City \u00b7 1 platoon',[group('PL-50','D-03 14:05',ready(8,0,0,0),[br('Ready','PV-0441','91%','Hopper \u00b7 D-03'),br('Ready','PV-0447','68%','Tank \u00b7 D-03')],false,'+6 ready \u00b7 departs in 23 min')]),
+ col('DAL','Dallas \u00b7 1 platoon',[group('PL-51','D-01 14:40',ready(6,0,4,0),[br('Ready','PV-0731','72%','Flat \u00b7 B-06'),br('Ready','PV-0738','80%','Box \u00b7 B-06'),br('Pending','4 open','','Assembling \u00b7 6 of 10')],false,'+4 ready')]),
+ col('ATL','Atlanta \u00b7 1 platoon',[group('PL-53','D-03 15:10',ready(4,0,5,0),[br('Ready','PV-0683','70%','Tank \u00b7 B-11'),br('Ready','PV-0690','75%','Box \u00b7 B-11'),br('Pending','5 open','','Draft \u00b7 4 of 9')],false,'+2 ready')])];
+const D=$fig.frame({name:'03 \u00b7 Block board \u00b7 fleet by destination',x:3080,y:0,width:1440,height:900,fills:F('bg/base'),clipsContent:true});
+header(D);
+const lg=(c,l)=>$fig.autoLayout({name:l,itemSpacing:6,counterAxisAlignItems:'CENTER'},[$fig.ellipse({name:'Dot',width:6,height:6,fills:F(c)}),T(l,'cap','text/muted')]);
+const main=$fig.autoLayout({name:'Main',x:0,y:56,width:1080,height:844,layoutSizingHorizontal:'FIXED',layoutSizingVertical:'FIXED',layoutMode:'VERTICAL',itemSpacing:0},[
+ $fig.autoLayout({name:'Toolbar',layoutSizingHorizontal:'FILL',counterAxisAlignItems:'CENTER',itemSpacing:N('s4'),...P(N('s4'),N('s4'),N('s4'),N('s3')),strokes:F('line/subtle'),strokeWeight:1},[$fig.autoLayout({name:'Title',layoutMode:'VERTICAL',itemSpacing:2},[T('Blocks','h','text/primary'),T('6 destinations \u00b7 7 platoons \u00b7 PL-52 selected','meta','text/muted')]),sp(),lg('flow','Ready'),lg('live','Charging / low'),lg('jam','Violation'),lg('text/disabled','Not picked')]),
+ $fig.autoLayout({name:'Board',layoutSizingHorizontal:'FILL',layoutGrow:1,itemSpacing:0,...P(N('s1'),0,0,0)},cols)]);
+D.append(main);
+D.append($fig.instance(RAIL,{x:1080,y:56}));
+await $fig.done();
+const Dn=D.node;
+const rc=Dn.findAllWithCriteria({types:['INSTANCE']}).find(i=>i.mainComponent&&i.mainComponent.parent&&i.mainComponent.parent.id===COMP.runChip);if(rc)rc.findAllWithCriteria({types:['TEXT']})[0].characters='LIVE \u00b7 13:42';
+const bs=brow.node;for(const c of bs.children){c.layoutSizingVertical='HUG';c.strokeTopWeight=0;c.strokeLeftWeight=0;c.strokeRightWeight=0;c.strokeBottomWeight=1;}let y=16;for(const c of bs.children){c.x=16;c.y=y;y+=c.height+8;}bs.resizeWithoutConstraints(192,y+8);
+const tb=main.node.children[0];tb.strokeTopWeight=0;tb.strokeLeftWeight=0;tb.strokeRightWeight=0;tb.strokeBottomWeight=1;
+for(const c of main.node.children[1].children){c.strokeTopWeight=0;c.strokeLeftWeight=0;c.strokeBottomWeight=0;c.strokeRightWeight=1;}
+for(const g of Dn.findAllWithCriteria({types:['FRAME']}).filter(f=>f.name==='Group PL-52')){g.strokeTopWeight=0;g.strokeRightWeight=0;g.strokeBottomWeight=0;g.strokeLeftWeight=2;}
+return {D:Dn.id,brow:bs.id};
