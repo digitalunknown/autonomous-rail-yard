@@ -30,6 +30,8 @@
       <div id="dossier"></div>
       <div id="fpop" role="dialog" aria-label="Inject fault"></div>
 
+      <div id="mchips"><button id="mFit" class="mchip" aria-label="Recenter on the bowl" title="Recenter"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2.5M8 12v2.5M1.5 8H4M12 8h2.5"/></svg></button><button id="mFull" class="mchip" aria-label="Hide controls (immersive map)" title="Hide controls"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button><button id="mRail" class="mchip" aria-label="Show tabs" title="Show tabs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button></div>
+      <button id="mExit" class="mchip" aria-label="Show controls" title="Show controls"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg></button>
       <div id="legendWrap">
         <div id="legend" role="region" aria-label="Map legend">
           <span class="lh">Track</span><span class="lh">Vehicle</span><span class="lh">State</span>
@@ -49,7 +51,7 @@
         <div class="clock"><div class="k">Run 01 · playhead</div><div class="t" id="clock">T+00:00:00</div></div>
       </div>
       <div class="trow"><div class="seg" id="speedSeg" role="group" aria-label="Speed"><button data-s="1">1×</button><button data-s="4" class="on">4×</button><button data-s="16">16×</button></div>
-        <button class="rbtn" id="resetBtn" title="Reset the run">Reset</button></div>
+        <button class="rbtn" id="resetBtn" title="Reset the run">Reset</button><button id="tlToggle" aria-expanded="false" aria-label="Expand timeline" title="Timeline"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4-4 4 4"/></svg></button></div>
     </div>
     <div class="tl"><div class="tl-head"><span class="tlh-l"><b>Throughput · 6 h</b><button id="liveBtn" class="on"><i></i>LIVE</button><span class="hint">Drag to scrub</span></span><span class="lg"><span><i style="background:var(--fg)"></i>Sorted</span><span><i class="dash"></i>Departed</span><span><i class="sq" style="background:rgba(255,255,255,.14)"></i>Queue</span><span><i class="sq" style="background:rgba(255,75,62,.45)"></i>Jam</span><span><i class="dia" style="background:var(--red)"></i>Fault</span><span><i style="background:var(--cobalt)"></i>Playhead</span></span></div><div class="tlbox"><canvas id="tl" aria-label="Throughput timeline"></canvas><div id="tltip"></div></div></div>
   </section>
@@ -118,6 +120,12 @@
     <div class="rdesc" id="ruleDesc"></div>
   </div>
 </aside>
-<nav id="mtabs" aria-label="Sections"><button data-mt="map" class="on">Map</button><button data-mt="metrics">Metrics</button><button data-mt="faults">Faults<i id="mtFault"></i></button><button data-mt="vars">Variables</button></nav>
+<aside id="mapSheet" aria-label="Map options"><div class="sheet-head"><span class="grab"></span><b>Map</b><button id="msClose">Done</button></div>
+  <div class="ms-sec"><div class="ms-k">Layers</div><div id="msLayers"></div></div>
+  <div class="ms-sec"><div class="ms-k">View</div><div class="ms-row"><div class="ms-zoom"><button id="msOut" aria-label="Zoom out">−</button><span id="msPct">100%</span><button id="msIn" aria-label="Zoom in">+</button></div><button id="msFit"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2.5M8 12v2.5M1.5 8H4M12 8h2.5"/></svg>Recenter</button><button id="msFull"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>Hide controls</button></div>
+    <p class="ms-hint">Pinch or double-tap to zoom in, two-finger tap to zoom out. Long-press the map to inject a fault.</p></div>
+  <div class="ms-sec"><div class="ms-k">Legend</div><div id="msLegend"></div></div>
+</aside>
+<nav id="mtabs" aria-label="Sections"><button data-mt="map">Map</button><button data-mt="metrics">Metrics</button><button data-mt="faults">Faults<i id="mtFault"></i></button><button data-mt="vars">Variables</button><button id="railHide" aria-label="Hide tabs" title="Hide tabs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button></nav>
 <div id="scrim"></div>
 </div>

@@ -630,6 +630,113 @@ tr.picked td{background:var(--cobalt-a)!important}
   #dossier.sel{right:auto;width:280px;max-height:80%!important}
   #pickBanner{top:calc(40px + env(safe-area-inset-top))}
 }
+
+/* ---- map-first phone layout: full-bleed map under thin translucent chrome; desktop never sees these ---- */
+#mchips,#mExit,#tlToggle,#mapSheet,#railHide{display:none}
+@media (max-width:820px),(max-height:520px){
+  #app{--chT:calc(40px + env(safe-area-inset-top));--tabH:calc(44px + env(safe-area-inset-bottom));--railW:0px;--chB:calc(var(--tabH) + 70px);--glass:rgba(13,16,19,.8);--blur:blur(14px) saturate(1.3)}
+  header{height:var(--chT)}
+  .product{font-size:13px}
+  .viewseg button{height:30px!important;padding:0 10px}
+  .live{height:28px}
+  #pickBanner{top:var(--chT)}
+  #app:not(.asm) header,#app:not(.asm) #bottom,#app:not(.asm) #mtabs{background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+  #app:not(.asm) header{position:fixed;top:0;left:0;right:var(--railW);z-index:10;padding-left:calc(var(--s-3) + env(safe-area-inset-left));padding-right:calc(var(--s-3) + env(safe-area-inset-right));border-bottom:1px solid rgba(255,255,255,.06)}
+  #app:not(.asm) #left,#app:not(.asm) #mapwrap{display:block}
+  #app:not(.asm) #outcomes{display:none}
+  #app.sheet-metrics #outcomes{display:block}
+  #app:not(.asm){position:relative}
+  #app:not(.asm) #left,#app:not(.asm) #mapwrap{position:static}
+  #app:not(.asm) #mapbox{position:absolute;inset:0;min-height:0;z-index:auto} /* absolute, no z-index: no stacking context, so the fault sheet can sit above the chrome */
+  #zoomctl,#legendWrap{display:none!important}
+  /* status chip + replay / pick docks: a small stack in the top-left corner */
+  .map-head{position:fixed;top:calc(var(--chT) + 8px);left:calc(8px + env(safe-area-inset-left));z-index:6;padding:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;max-width:calc(100vw - 72px);transition:opacity var(--dur-2),transform var(--dur-3) var(--ease-out)}
+  .map-head>div:first-child{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+  .map-title{font-size:0;line-height:0}
+  #statusChip{-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+  #statusChip.ok{background:rgba(23,27,32,.8)}
+  .dock{pointer-events:auto;height:32px;padding:0 4px 0 10px;border-radius:16px;background:var(--glass);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid var(--line-2)}
+  .dock button{min-height:0!important;height:26px;border-radius:13px}
+  #pickTxt{display:none}
+  /* corner chips */
+  #mchips{display:flex;flex-direction:column;gap:8px;position:absolute;top:calc(var(--chT) + 8px);right:calc(8px + env(safe-area-inset-right));z-index:6;transition:opacity var(--dur-2),transform var(--dur-3) var(--ease-out)}
+  .mchip{position:relative;display:grid;place-items:center;width:32px;height:32px;min-height:0!important;padding:0;border-radius:16px;background:rgba(13,16,19,.6);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.1);color:var(--fg-2)}
+  .mchip::after{content:"";position:absolute;inset:-6px}
+  .mchip:active{background:var(--bg-3);color:var(--fg)}
+  #mRail{display:none}
+  #mExit{display:none;position:absolute;top:calc(env(safe-area-inset-top) + 8px);right:calc(8px + env(safe-area-inset-right));z-index:7}
+  /* thin bottom bar: transport row + collapsible scrubber */
+  #app:not(.asm) #bottom{position:fixed;left:0;right:var(--railW);bottom:var(--tabH);z-index:10;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 28px;border-top:1px solid rgba(255,255,255,.06)}
+  #app.tl-open:not(.asm) #bottom{grid-template-rows:auto 92px}
+  .transport{padding:4px calc(var(--s-3) + env(safe-area-inset-right)) 0 calc(var(--s-3) + env(safe-area-inset-left));border-bottom:0;gap:6px}
+  .trow{gap:6px}
+  #play{width:40px;height:40px}
+  .clock .t{font-size:15px}
+  #speedSeg button{min-width:36px;height:34px;min-height:34px}
+  .rbtn{height:34px;min-height:34px;margin-left:0}
+  #tlToggle{display:grid;place-items:center;width:34px;height:34px;min-height:34px;padding:0;border-radius:var(--r-1);color:var(--fg-2);border:1px solid var(--line-2)}
+  #tlToggle svg{transition:transform var(--dur-2)}
+  #app.tl-open #tlToggle svg{transform:rotate(180deg)}
+  .tl{padding:0 calc(var(--s-3) + env(safe-area-inset-right)) 2px calc(var(--s-3) + env(safe-area-inset-left));grid-template-rows:minmax(0,1fr)}
+  .tl-head{display:none}
+  #app.tl-open .tl{grid-template-rows:auto minmax(0,1fr);padding-top:2px}
+  #app.tl-open .tl-head{display:flex}
+  /* tab bar: 44 px */
+  #app:not(.asm) #mtabs{position:fixed;left:0;right:0;bottom:0;z-index:10;border-top:1px solid rgba(255,255,255,.06)}
+  #mtabs button[data-mt]{height:44px}
+  #mtabs i{top:10px}
+  /* the dossier sheet sits just above the chrome */
+  #dossier.sel{bottom:calc(var(--chB) + 8px);max-height:min(46%,calc(100% - var(--chT) - var(--chB) - 24px))!important}
+  /* map sheet: layers, view, legend */
+  #mapSheet{display:block;position:fixed;left:0;right:0;bottom:0;max-height:74vh;max-height:74dvh;overflow-y:auto;z-index:40;background:var(--bg-1);border-top:1px solid var(--line-3);border-radius:12px 12px 0 0;box-shadow:var(--shadow-overlay);
+    transform:translateY(105%);transition:transform var(--dur-3) var(--ease-out);padding-bottom:calc(var(--s-4) + env(safe-area-inset-bottom));visibility:hidden}
+  #app.sheet-map #mapSheet{transform:none;visibility:visible}
+  .ms-sec{padding:var(--s-3) var(--s-4) 0}
+  .ms-k{font-size:var(--fs-label);font-weight:600;color:var(--fg-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--s-2)}
+  #msLayers .layers{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-2);max-width:none;overflow:visible}
+  #msLayers .layers button{height:44px;border:1px solid var(--line-2);font-size:var(--fs-body);padding:0 var(--s-3)}
+  .ms-row{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+  .ms-row>button{display:flex;align-items:center;gap:6px;height:44px;padding:0 var(--s-3);border:1px solid var(--line-2);border-radius:var(--r-1);color:var(--fg-2)}
+  .ms-zoom{display:flex;align-items:center;border:1px solid var(--line-2);border-radius:var(--r-1)}
+  .ms-zoom button{width:44px;height:44px;font-size:18px;color:var(--fg-2)}
+  #msPct{min-width:48px;text-align:center;font-family:var(--mono);font-size:var(--fs-data);color:var(--fg-2)}
+  .ms-hint{margin:var(--s-2) 0 0;font-size:var(--fs-meta);color:var(--fg-3);line-height:1.45}
+  #msLegend #legend{display:grid;border:0;background:none;padding:0;gap:6px var(--s-4)}
+  /* immersive: everything but the map slides away */
+  #app.immersive header{transform:translateY(-100%)}
+  #app.immersive #bottom,#app.immersive #mtabs{transform:translateY(calc(100% + var(--tabH) + 80px))}
+  #app.immersive .map-head{opacity:0;pointer-events:none}
+  #app.immersive .map-head .dock{pointer-events:none}
+  #app.immersive #mchips{opacity:0;pointer-events:none}
+  #app.immersive #mExit{display:grid}
+  #app.immersive #dossier.sel{bottom:calc(8px + env(safe-area-inset-bottom));max-height:46%!important}
+  #app:not(.asm) header,#app:not(.asm) #bottom,#app:not(.asm) #mtabs{transition:transform var(--dur-3) var(--ease-out),opacity var(--dur-2)}
+  /* while a finger pans or pinches, the chrome fades back so more of the yard shows through */
+  #app.panning header,#app.panning #bottom,#app.panning #mtabs,#app.panning #mchips,#app.panning .map-head{opacity:.3}
+}
+@media (max-height:520px) and (orientation:landscape){
+  #app{--chT:calc(36px + env(safe-area-inset-top));--railW:calc(56px + env(safe-area-inset-right));--tabH:0px;--chB:calc(44px + env(safe-area-inset-bottom))}
+  #app.rail-off{--railW:0px}
+  #app:not(.asm){display:block}
+  #app:not(.asm) #mtabs{left:auto;top:0;right:0;bottom:0;width:var(--railW);flex-direction:column;border-top:0;border-left:1px solid rgba(255,255,255,.06);padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) 0}
+  #mtabs button[data-mt]{height:auto;flex:1;font-size:var(--fs-label)}
+  #railHide{display:grid;place-items:center;flex:none;height:40px;min-height:0!important;color:var(--fg-3);border-top:1px solid var(--line)}
+  #app.rail-off #mtabs{transform:translateX(100%)}
+  #app.rail-off #mRail{display:grid}
+  #app:not(.asm) #bottom{bottom:0;grid-template-columns:auto minmax(0,1fr);grid-template-rows:44px;padding-bottom:env(safe-area-inset-bottom)}
+  #app.tl-open:not(.asm) #bottom{grid-template-rows:76px}
+  .transport{padding:0 var(--s-3) 0 calc(var(--s-3) + env(safe-area-inset-left));border-right:1px solid rgba(255,255,255,.06)}
+  .tl{padding:3px var(--s-3)}
+  #app.tl-open .tl{grid-template-rows:minmax(0,1fr)}
+  #app.tl-open .tl-head{display:none}
+  #app.tl-open{--chB:calc(76px + env(safe-area-inset-bottom))}
+  #mchips{right:calc(var(--railW) + 8px)}
+  #app.rail-off #mchips{right:calc(8px + env(safe-area-inset-right))}
+  #yardSide,#app.sheet-metrics #outcomes,#mapSheet{left:auto;right:var(--railW);width:min(440px,80vw);max-height:92vh;max-height:92dvh}
+  #mapSheet{top:auto}
+  #app.immersive #mtabs{transform:translateX(100%)}
+  #dossier.sel{width:280px}
+}
 </style></head>
 <body>
 <div id="app">
@@ -663,6 +770,8 @@ tr.picked td{background:var(--cobalt-a)!important}
       <div id="dossier"></div>
       <div id="fpop" role="dialog" aria-label="Inject fault"></div>
 
+      <div id="mchips"><button id="mFit" class="mchip" aria-label="Recenter on the bowl" title="Recenter"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2.5M8 12v2.5M1.5 8H4M12 8h2.5"/></svg></button><button id="mFull" class="mchip" aria-label="Hide controls (immersive map)" title="Hide controls"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button><button id="mRail" class="mchip" aria-label="Show tabs" title="Show tabs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button></div>
+      <button id="mExit" class="mchip" aria-label="Show controls" title="Show controls"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg></button>
       <div id="legendWrap">
         <div id="legend" role="region" aria-label="Map legend">
           <span class="lh">Track</span><span class="lh">Vehicle</span><span class="lh">State</span>
@@ -682,7 +791,7 @@ tr.picked td{background:var(--cobalt-a)!important}
         <div class="clock"><div class="k">Run 01 · playhead</div><div class="t" id="clock">T+00:00:00</div></div>
       </div>
       <div class="trow"><div class="seg" id="speedSeg" role="group" aria-label="Speed"><button data-s="1">1×</button><button data-s="4" class="on">4×</button><button data-s="16">16×</button></div>
-        <button class="rbtn" id="resetBtn" title="Reset the run">Reset</button></div>
+        <button class="rbtn" id="resetBtn" title="Reset the run">Reset</button><button id="tlToggle" aria-expanded="false" aria-label="Expand timeline" title="Timeline"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4-4 4 4"/></svg></button></div>
     </div>
     <div class="tl"><div class="tl-head"><span class="tlh-l"><b>Throughput · 6 h</b><button id="liveBtn" class="on"><i></i>LIVE</button><span class="hint">Drag to scrub</span></span><span class="lg"><span><i style="background:var(--fg)"></i>Sorted</span><span><i class="dash"></i>Departed</span><span><i class="sq" style="background:rgba(255,255,255,.14)"></i>Queue</span><span><i class="sq" style="background:rgba(255,75,62,.45)"></i>Jam</span><span><i class="dia" style="background:var(--red)"></i>Fault</span><span><i style="background:var(--cobalt)"></i>Playhead</span></span></div><div class="tlbox"><canvas id="tl" aria-label="Throughput timeline"></canvas><div id="tltip"></div></div></div>
   </section>
@@ -751,7 +860,13 @@ tr.picked td{background:var(--cobalt-a)!important}
     <div class="rdesc" id="ruleDesc"></div>
   </div>
 </aside>
-<nav id="mtabs" aria-label="Sections"><button data-mt="map" class="on">Map</button><button data-mt="metrics">Metrics</button><button data-mt="faults">Faults<i id="mtFault"></i></button><button data-mt="vars">Variables</button></nav>
+<aside id="mapSheet" aria-label="Map options"><div class="sheet-head"><span class="grab"></span><b>Map</b><button id="msClose">Done</button></div>
+  <div class="ms-sec"><div class="ms-k">Layers</div><div id="msLayers"></div></div>
+  <div class="ms-sec"><div class="ms-k">View</div><div class="ms-row"><div class="ms-zoom"><button id="msOut" aria-label="Zoom out">−</button><span id="msPct">100%</span><button id="msIn" aria-label="Zoom in">+</button></div><button id="msFit"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2.5M8 12v2.5M1.5 8H4M12 8h2.5"/></svg>Recenter</button><button id="msFull"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>Hide controls</button></div>
+    <p class="ms-hint">Pinch or double-tap to zoom in, two-finger tap to zoom out. Long-press the map to inject a fault.</p></div>
+  <div class="ms-sec"><div class="ms-k">Legend</div><div id="msLegend"></div></div>
+</aside>
+<nav id="mtabs" aria-label="Sections"><button data-mt="map">Map</button><button data-mt="metrics">Metrics</button><button data-mt="faults">Faults<i id="mtFault"></i></button><button data-mt="vars">Variables</button><button id="railHide" aria-label="Hide tabs" title="Hide tabs"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button></nav>
 <div id="scrim"></div>
 </div>
 <script>
@@ -1610,6 +1725,7 @@ function drawTL(){
   const ctx=tctx,w=tlC.clientWidth,h=tlC.clientHeight;if(tlC.width!==Math.round(w*DPR)||tlC.height!==Math.round(h*DPR)){tlC.width=Math.round(w*DPR);tlC.height=Math.round(h*DPR);}ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,tlC.width,tlC.height);ctx.setTransform(DPR,0,0,DPR,0,0);
   const WIN=6*3600,LT=HIST.liveT,end=Math.max(WIN,LT+BIN),start=end-WIN;const L=4,Rr=4,top=12,bot=15,ph=h-top-bot;const X=t=>L+(t-start)/WIN*(w-L-Rr);
   const{n,sr,dr,q,src}=tlRates();const bands=[];
+  if(h<50&&isMobile()){drawTLThin(ctx,w,h,start,end,WIN,LT,src);return;}
   TLG={start,end,L,Rr,top,ph,w,h,X,T:t=>start+(t-L)/(w-L-Rr)*WIN,bands};
   setFont(ctx,10,500);ctx.textBaseline='alphabetic';
   for(let hh=Math.ceil(start/3600);hh*3600<=end;hh++){const x=X(hh*3600);ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillRect(x,top,1,ph);ctx.fillStyle='#818b96';ctx.textAlign='center';ctx.fillText(p2(hh)+':00',Math.min(w-16,Math.max(16,x)),h-3);}
@@ -1643,6 +1759,15 @@ function drawTL(){
   ctx.fillStyle=C.cobalt;ctx.fillRect(px-.75,top-2,1.5,ph+2);ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.fill();
   ctx.strokeStyle='#0d1013';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.stroke();
 }
+// phones: the collapsed timeline is a thin scrubber (recorded span, fault/jam marks, replay span, playhead); tap ⌃ for the chart
+function drawTLThin(ctx,w,h,start,end,WIN,LT,src){const L=10,Rr=10,top=2,ph=h-4,X=t=>L+(t-start)/WIN*(w-L-Rr),cy=Math.round(h/2);
+  TLG={start,end,L,Rr,top,ph,w,h,X,T:t=>start+(t-L)/(w-L-Rr)*WIN,bands:[],thin:true};
+  ctx.fillStyle='rgba(255,255,255,.10)';ctx.fillRect(L,cy-1.5,w-L-Rr,3);
+  const mt=Math.max(start,minScrubT());ctx.fillStyle='rgba(233,237,241,.38)';ctx.fillRect(X(mt),cy-1.5,Math.max(0,X(LT)-X(mt)),3);
+  for(let hh=Math.ceil(start/3600);hh*3600<=end;hh++){ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(X(hh*3600)-.5,cy-4,1,8);}
+  for(const j of src.jams.concat(src.faults)){const b=j.b==null?LT:j.b;if(b<start)continue;const a=X(Math.max(start,j.a)),bb=X(b);ctx.fillStyle='rgba(255,75,62,.85)';ctx.fillRect(a,cy-3,Math.max(2,bb-a),6);}
+  const px=X(S.t);if(isReplay()){ctx.fillStyle='rgba(61,107,255,.55)';ctx.fillRect(px,cy-1.5,X(LT)-px,3);ctx.fillStyle='#e9edf1';ctx.fillRect(X(LT)-.5,cy-5,1,10);}
+  ctx.fillStyle=C.cobalt;ctx.beginPath();ctx.arc(px,cy,6,0,7);ctx.fill();ctx.strokeStyle='#0d1013';ctx.lineWidth=1.5;ctx.stroke();}
 // mini-map with viewport box (shown above 1.5x)
 function drawMini(){
   const show=view.z>1.5;miniC.style.display=show?'block':'none';if(!show){MINI=null;return;}
@@ -2028,29 +2153,91 @@ function initAsmUI(){
   document.addEventListener('pointerdown',e=>{if(AUI.edit&&!e.target.closest('#cedit')&&!e.target.closest('.car')){closeEditor();renderAsm(true);}},true);}
 function applySuggested(){const pl=curPlan();const sg=suggest(pl);if(!sg.changes.length)return;commitAsm(()=>{for(const ch of sg.changes)applyChange(ch,pl);});AUI.mode='cur';renderAsm(true);}
 // ================= MOBILE: phones portrait (≤820 px wide) or landscape (≤520 px tall). Layout is CSS; this adds sheets, tabs and touch gestures.
+// Map-first: the map canvas is full-bleed under thin translucent chrome. Zoom is pinch / double-tap / two-finger tap; layers, legend
+// and zoom buttons live in the Map sheet; two 32 px corner chips (recenter, immersive) are the only things floating on the map.
 const MQ=window.matchMedia('(max-width: 820px), (max-height: 520px)');
-let MSHEET=null,lpT=null;
+let lastPT='mouse',MSHEET=null,lpT=null,MIMM=false,lastTap=null,twoTap=null,panT=null;
 function isMobile(){return MQ.matches;}
-function openSheet(k){const app=$('app');k=k&&k!=='map'?k:null;MSHEET=k;
-  app.classList.remove('sheet','sheet-faults','sheet-vars','sheet-metrics');
-  if(k){app.classList.add('sheet','sheet-'+k);if(k!=='metrics')$('sheetTitle').textContent=k==='faults'?'Faults':'Variables';$('yardSide').scrollTop=0;}
-  document.querySelectorAll('#mtabs button').forEach(b=>{const on=b.dataset.mt===(k||'map');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});}
-function mobileTick(){const dz=$('dossier');if(dz&&dz.classList.contains('sel')&&!dz.querySelector('.dz-x'))dz.insertAdjacentHTML('afterbegin','<button class="dz-x" aria-label="Close details">×</button>');const d=$('mtFault');if(d)d.classList.toggle('on',!!(S&&(S.flist.length||S.faultOn)));}
+function openSheet(k){const app=$('app');k=k||null;MSHEET=k;
+  app.classList.remove('sheet','sheet-faults','sheet-vars','sheet-metrics','sheet-map');
+  if(k){app.classList.add('sheet','sheet-'+k);if(k==='faults'||k==='vars'){$('sheetTitle').textContent=k==='faults'?'Faults':'Variables';$('yardSide').scrollTop=0;}}
+  document.querySelectorAll('#mtabs button[data-mt]').forEach(b=>{const on=b.dataset.mt===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});}
+function mobileTick(){const dz=$('dossier');if(dz&&dz.classList.contains('sel')&&!dz.querySelector('.dz-x'))dz.insertAdjacentHTML('afterbegin','<button class="dz-x" aria-label="Close details">×</button>');
+  const d=$('mtFault');if(d)d.classList.toggle('on',!!(S&&(S.flist.length||S.faultOn)));
+  if(MSHEET==='map'){const z=Math.round(view.z*100)+'%';if($('msPct').textContent!==z)$('msPct').textContent=z;}}
 function cancelLP(){if(lpT){clearTimeout(lpT.t);lpT=null;}}
-// portrait phones open zoomed in on the bowl instead of the whole (very wide) yard
-function mobileView(){if(!isMobile()||innerHeight<innerWidth)return;fitView();zoomAt(2.2,VW*0.52,VH*0.56);}
+// measure the chrome so the default view, the dossier and the chips frame the part of the map you can actually see
+function chromeBox(){if(!isMobile()||VIEW!=='yard')return {top:0,bot:VH};const app=$('app');
+  if(MIMM)return {top:0,bot:VH};
+  const h=$$('header')?$$('header').getBoundingClientRect().bottom:0;
+  const b=Math.min($('bottom').getBoundingClientRect().top,innerHeight);return {top:Math.max(0,h),bot:Math.min(VH,b)};}
+function $$(s){return document.querySelector(s);}
+function mobileLayout(){if(!isMobile())return;const c=chromeBox();const app=$('app');
+  app.style.setProperty('--chB',Math.max(0,innerHeight-c.bot)+'px');}
+// the area worth seeing on a phone: hump lead, bowl ladders, bowl and charging tracks
+let FOCUS=null;
+function focusBounds(){if(FOCUS)return FOCUS;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  let b0=1e9,b1=-1e9;
+  for(const e of EL){if(!(e.kind==='lead'||e.kind==='bowl'||e.kind==='charge'||e.track==='Bowl ladder'))continue;for(const p of e.pts){x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1]);if(e.kind!=='lead'){b0=Math.min(b0,p[1]);b1=Math.max(b1,p[1]);}}}
+  return FOCUS={x0,y0,x1,y1,b0,b1};}
+// phones open framed on the bowl, fitted into the visible band between header and bottom bar
+function mobileView(){if(!isMobile())return;mobileLayout();const c=chromeBox();const f=focusBounds();
+  const pad=14,vh=Math.max(80,c.bot-c.top-2*pad),vw=Math.max(80,VW-2*pad-(innerHeight<innerWidth?0:0));
+  const bw=f.x1-f.x0,bh=f.y1-f.y0,portrait=VH>VW*1.15;
+  // portrait: the yard is ~2:1 wide, so a whole-bowl fit leaves dead bands; crop sideways instead, keeping the hump end
+  // (ladder, cuts rolling in, track IDs) and letting the long track tails run off to the right
+  const k=portrait?Math.min(vh/bh,2.1*vw/bw):Math.min(vw/bw,vh/bh);view.z=clamp(k/Kfit,ZMIN,ZMAX);const K2=Kfit*view.z;
+  view.cx=portrait?f.x0-pad/K2+VW/2/K2:(f.x0+f.x1)/2;view.cy=(portrait?(f.b0+f.b1)/2:(f.y0+f.y1)/2)-((c.top+c.bot)/2-VH/2)/K2;applyView();}
+function setImmersive(on){MIMM=!!on;const app=$('app');app.classList.toggle('immersive',MIMM);if(MIMM)openSheet(null);
+  const de=document.documentElement;
+  try{if(MIMM&&document.fullscreenEnabled&&!document.fullscreenElement&&de.requestFullscreen)de.requestFullscreen({navigationUI:'hide'}).catch(()=>{});
+    else if(!MIMM&&document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}catch(_){}
+  setTimeout(mobileLayout,380);}
+function setTL(open){$('app').classList.toggle('tl-open',open);$('tlToggle').setAttribute('aria-expanded',open);$('tlToggle').setAttribute('aria-label',open?'Collapse timeline':'Expand timeline');requestAnimationFrame(()=>{mobileLayout();refresh(true);});}
+// layers + legend live in the Map sheet on phones and go back to the map head / legend chip on desktop
+function placeMapControls(){const lay=$$('.layers'),leg=$('legend');
+  if(isMobile()){if(lay.parentElement.id!=='msLayers')$('msLayers').appendChild(lay);if(leg.parentElement.id!=='msLegend')$('msLegend').appendChild(leg);}
+  else{const mh=$$('.map-head');if(lay.parentElement!==mh)mh.appendChild(lay);const lw=$('legendWrap');if(leg.parentElement!==lw)lw.insertBefore(leg,$('legendBtn'));}}
 function initMobile(){
-  document.querySelectorAll('#mtabs button').forEach(b=>b.onclick=()=>openSheet(b.dataset.mt===MSHEET?null:b.dataset.mt));
+  document.querySelectorAll('#mtabs button[data-mt]').forEach(b=>b.onclick=()=>openSheet(b.dataset.mt===MSHEET?null:b.dataset.mt));
   $('dossier').addEventListener('click',e=>{if(e.target.closest('.dz-x')){selected=null;refresh(true);}});
-  $('sheetClose').onclick=()=>openSheet(null);$('scrim').onclick=()=>openSheet(null);
-  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&MSHEET){openSheet(null);e.stopPropagation();}},true);
-  const onChange=()=>{openSheet(null);if(VIEW==='yard'){resize();staticDirty=true;}refresh(true);renderAsm(true);};
+  $('sheetClose').onclick=()=>openSheet(null);$('scrim').onclick=()=>openSheet(null);$('msClose').onclick=()=>openSheet(null);
+  $('mFit').onclick=()=>mobileView();$('msFit').onclick=()=>{openSheet(null);mobileView();};
+  $('mFull').onclick=()=>setImmersive(true);$('msFull').onclick=()=>setImmersive(true);$('mExit').onclick=()=>setImmersive(false);
+  $('msIn').onclick=()=>zoomTo(view.z*1.25);$('msOut').onclick=()=>zoomTo(view.z/1.25);
+  $('tlToggle').onclick=()=>setTL(!$('app').classList.contains('tl-open'));
+  $('railHide').onclick=()=>{openSheet(null);$('app').classList.add('rail-off');};$('mRail').onclick=()=>$('app').classList.remove('rail-off');
+  document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&MIMM)setImmersive(false);});
+  window.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(MSHEET){openSheet(null);e.stopPropagation();}else if(MIMM){setImmersive(false);e.stopPropagation();}},true);
+  placeMapControls();
+  // double-tap is handled above with the touch bookkeeping; keep the desktop dblclick zoom from doubling it on phones
+  window.addEventListener('dblclick',e=>{if(e.target===mapC&&lastPT!=='mouse')e.stopPropagation();},true);
+  const onChange=()=>{openSheet(null);setImmersive(false);placeMapControls();if(VIEW==='yard'){resize();staticDirty=true;}if(isMobile())requestAnimationFrame(mobileView);refresh(true);renderAsm(true);};
   if(MQ.addEventListener)MQ.addEventListener('change',onChange);else MQ.addListener(onChange);
+  const OQ=matchMedia('(orientation: portrait)');const onRot=()=>{if(isMobile())setTimeout(()=>{resize();mobileView();},60);};
+  if(OQ.addEventListener)OQ.addEventListener('change',onRot);else OQ.addListener(onRot);
+  window.addEventListener('resize',()=>{if(isMobile())requestAnimationFrame(mobileLayout);});
   // long-press on the map (touch / pen) opens the fault menu, like right-click on desktop
   mapC.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;cancelLP();const r=mapC.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
-    lpT={x,y,t:setTimeout(()=>{if(ptrs.size>1){lpT=null;return;}if(drag)drag.moved=true;lpT=null;if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}openPop(x,y);},520)};});
-  mapC.addEventListener('pointermove',e=>{if(!lpT)return;const r=mapC.getBoundingClientRect();if(Math.hypot(e.clientX-r.left-lpT.x,e.clientY-r.top-lpT.y)>10||ptrs.size>1)cancelLP();});
-  mapC.addEventListener('pointerup',cancelLP);mapC.addEventListener('pointercancel',cancelLP);
+    lpT={x,y,t:setTimeout(()=>{if(ptrs.size>1){lpT=null;return;}if(drag)drag.moved=true;lpT=null;if(navigator.vibrate)try{navigator.vibrate(12);}catch(_){}openPop(x,y);},520)};
+    // gesture bookkeeping: double-tap zoom in, two-finger tap zoom out, tap-to-restore in immersive
+    // (5_ui's own pointerdown ran first, so ptrs already counts this finger)
+    const now=performance.now();lastPT=e.pointerType;
+    if(ptrs.size===2&&mapC._tap&&now-mapC._tap.t<250){twoTap={t:now,moved:!!mapC._tap.moved,x:(x+mapC._tap.x)/2,y:(y+mapC._tap.y)/2};lastTap=null;return;}
+    if(ptrs.size===1)twoTap=null;
+    mapC._tap={x,y,t:now,sel:selected,moved:false};});
+  mapC.addEventListener('pointermove',e=>{const r=mapC.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+    const tp=mapC._tap;if(tp&&Math.hypot(x-tp.x,y-tp.y)>10){tp.moved=true;if(twoTap)twoTap.moved=true;}
+    if(e.pointerType!=='mouse'&&tp&&tp.moved&&isMobile()){$('app').classList.add('panning');clearTimeout(panT);}
+    if(!lpT)return;if(Math.hypot(x-lpT.x,y-lpT.y)>10||ptrs.size>1)cancelLP();});
+  const up=e=>{cancelLP();if(e.pointerType==='mouse'||!isMobile())return;clearTimeout(panT);panT=setTimeout(()=>$('app').classList.remove('panning'),220);
+    const tp=mapC._tap,now=performance.now();if(!tp)return;
+    if(twoTap){if(ptrs.size>0)return;const tt=twoTap;twoTap=null;lastTap=null;mapC._tap=null;if(!tt.moved&&now-tt.t<350&&e.type==='pointerup')zoomAt(1/1.8,tt.x,tt.y);return;}
+    if(e.type!=='pointerup'||tp.moved||now-tp.t>300||ptrs.size>1){lastTap=null;return;}
+    if(lastTap&&now-lastTap.t<320&&Math.hypot(tp.x-lastTap.x,tp.y-lastTap.y)<30){lastTap=null;zoomAt(1.8,tp.x,tp.y);return;}
+    lastTap={x:tp.x,y:tp.y,t:now};
+    if(MIMM&&!tp.sel)setTimeout(()=>{if(!selected&&lastTap&&performance.now()-lastTap.t>=300)setImmersive(false);},330);};
+  mapC.addEventListener('pointerup',up);mapC.addEventListener('pointercancel',up);
 }
 // ---------------- UI
 const $=id=>document.getElementById(id);

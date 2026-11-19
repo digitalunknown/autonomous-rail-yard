@@ -18,7 +18,7 @@ Or open `yard-control-v2.html` locally.
 - **Fault injector:** stuck turnouts, retarder failure, charger outage, battery drop, blocked track, from the panel or right-click on the map
 - **Assembly view:** build outbound trains from yard inventory, assign cargo per car (type, tonnes, hazmat, reefer), with live checks for length, gross weight, axle load, block order, hazmat adjacency, battery range, and brake margin. Send to yard and the sim pulls, marshals, and departs it.
 
-- **Mobile:** the same file adapts to phones (≤820 px wide, or landscape). The map fills the screen with pinch-zoom and one-finger pan, there's a compact play/speed bar and a touch-scrub timeline, and Metrics, Faults, and Variables open as bottom sheets. Long-press the map for the fault menu. In Assembly, sections stack and you tap to place cars and shipments.
+- **Mobile:** the same file adapts to phones (≤820 px wide, or landscape). The map runs edge to edge under a thin translucent header, bottom bar and tab bar. Pinch, double-tap or one-finger pan to move around; a two-finger tap zooms out. Layers, legend and zoom live in the Map sheet; Metrics, Faults and Variables are bottom sheets. The timeline collapses to a thin scrubber (tap ⌃ for the chart). A corner chip hides all controls for a full-screen map. In landscape the tab rail collapses. Long-press the map for the fault menu. In Assembly, sections stack and you tap to place cars and shipments.
 
 Keyboard: Space play/pause, ←/→ scrub, +/− zoom, 0 fit.
 

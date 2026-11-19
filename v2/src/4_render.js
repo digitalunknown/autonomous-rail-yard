@@ -233,6 +233,7 @@ function drawTL(){
   const ctx=tctx,w=tlC.clientWidth,h=tlC.clientHeight;if(tlC.width!==Math.round(w*DPR)||tlC.height!==Math.round(h*DPR)){tlC.width=Math.round(w*DPR);tlC.height=Math.round(h*DPR);}ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,tlC.width,tlC.height);ctx.setTransform(DPR,0,0,DPR,0,0);
   const WIN=6*3600,LT=HIST.liveT,end=Math.max(WIN,LT+BIN),start=end-WIN;const L=4,Rr=4,top=12,bot=15,ph=h-top-bot;const X=t=>L+(t-start)/WIN*(w-L-Rr);
   const{n,sr,dr,q,src}=tlRates();const bands=[];
+  if(h<50&&isMobile()){drawTLThin(ctx,w,h,start,end,WIN,LT,src);return;}
   TLG={start,end,L,Rr,top,ph,w,h,X,T:t=>start+(t-L)/(w-L-Rr)*WIN,bands};
   setFont(ctx,10,500);ctx.textBaseline='alphabetic';
   for(let hh=Math.ceil(start/3600);hh*3600<=end;hh++){const x=X(hh*3600);ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillRect(x,top,1,ph);ctx.fillStyle='#818b96';ctx.textAlign='center';ctx.fillText(p2(hh)+':00',Math.min(w-16,Math.max(16,x)),h-3);}
@@ -266,6 +267,15 @@ function drawTL(){
   ctx.fillStyle=C.cobalt;ctx.fillRect(px-.75,top-2,1.5,ph+2);ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.fill();
   ctx.strokeStyle='#0d1013';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(px,top-2,4.5,0,7);ctx.stroke();
 }
+// phones: the collapsed timeline is a thin scrubber (recorded span, fault/jam marks, replay span, playhead); tap ⌃ for the chart
+function drawTLThin(ctx,w,h,start,end,WIN,LT,src){const L=10,Rr=10,top=2,ph=h-4,X=t=>L+(t-start)/WIN*(w-L-Rr),cy=Math.round(h/2);
+  TLG={start,end,L,Rr,top,ph,w,h,X,T:t=>start+(t-L)/(w-L-Rr)*WIN,bands:[],thin:true};
+  ctx.fillStyle='rgba(255,255,255,.10)';ctx.fillRect(L,cy-1.5,w-L-Rr,3);
+  const mt=Math.max(start,minScrubT());ctx.fillStyle='rgba(233,237,241,.38)';ctx.fillRect(X(mt),cy-1.5,Math.max(0,X(LT)-X(mt)),3);
+  for(let hh=Math.ceil(start/3600);hh*3600<=end;hh++){ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(X(hh*3600)-.5,cy-4,1,8);}
+  for(const j of src.jams.concat(src.faults)){const b=j.b==null?LT:j.b;if(b<start)continue;const a=X(Math.max(start,j.a)),bb=X(b);ctx.fillStyle='rgba(255,75,62,.85)';ctx.fillRect(a,cy-3,Math.max(2,bb-a),6);}
+  const px=X(S.t);if(isReplay()){ctx.fillStyle='rgba(61,107,255,.55)';ctx.fillRect(px,cy-1.5,X(LT)-px,3);ctx.fillStyle='#e9edf1';ctx.fillRect(X(LT)-.5,cy-5,1,10);}
+  ctx.fillStyle=C.cobalt;ctx.beginPath();ctx.arc(px,cy,6,0,7);ctx.fill();ctx.strokeStyle='#0d1013';ctx.lineWidth=1.5;ctx.stroke();}
 // mini-map with viewport box (shown above 1.5x)
 function drawMini(){
   const show=view.z>1.5;miniC.style.display=show?'block':'none';if(!show){MINI=null;return;}
