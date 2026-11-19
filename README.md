@@ -19,11 +19,13 @@ Each version is a single self-contained HTML file. No build step, no dependencie
 
 Keyboard: Space play/pause, ←/→ scrub, +/− zoom, 0 fit.
 
+![Yard view with active faults](images/yard-faults.png)
+![Assembly view](images/assembly.png)
+![Cargo editor](images/cargo-editor.png)
+
 ## Layout
+- `yard-control-v2.html`, `yard-control-v1.html`: the builds
 - `v2/src/`: v2 source. `python3 v2/build.py` rebuilds `v2/index.html` (copy it to `yard-control-v2.html`)
-- `v2/test/`: Playwright tests (`npm i playwright`, then `node v2/test/e2e.js`, `scrub.js`, `faults.js`, `anchor.js`, `asm.js`)
-- `src/`, `test/`, `index.html`: the v1 line
-- `shots/`, `v2/shots/`: screenshots per iteration
-- `assembly/`, `figma-sync/`: Figma exports for the Assembly view and style sync
+- `v2/test/`: Playwright tests (`npm i` in `v2/test`, then `node e2e.js`, `scrub.js`, `faults.js`, `anchor.js`, `asm.js`, plus `soak.js` / `fsoak.js`)
 
 Simulated data, not live telemetry.
