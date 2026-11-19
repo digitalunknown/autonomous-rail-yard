@@ -49,10 +49,13 @@ const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1;};
   await p.click('#faultBtn');ok(await get(()=>!__yard.S.faultOn),'Clear fault restores X-24');
   // 6. selection by real click
   await p.click('#resetBtn');await p.click('#play');await p.waitForTimeout(800);await p.click('#play');
+  ok(await get(()=>{__yard.select&&0;return getComputedStyle(document.getElementById('dossier')).display==='none';}),'no dossier box while nothing is selected');
   const vid=await get(()=>{const v=__yard.S.veh.find(v=>v.state==='classified')||__yard.S.veh[0];return v.id;});
   const xy=await get(id=>__yard.vehScreen(id),vid);await p.mouse.click(xy[0],xy[1]);await p.waitForTimeout(200);
   const sel=await get(()=>__yard.selected);ok(sel&&sel.type==='veh','clicking a vehicle selects it ('+(sel&&sel.id)+')');
   const dz=await p.textContent('#dossier');ok(/SoC/.test(dz)&&/DEST BLOCK/.test(dz)&&/TRACK/.test(dz)&&/STATE/.test(dz),'dossier shows ID/SoC/block/track/state');
+  ok(await get(()=>getComputedStyle(document.getElementById('dossier')).display!=='none'),'dossier appears once something is selected');
+  await p.keyboard.press('Escape');ok(await get(()=>getComputedStyle(document.getElementById('dossier')).display==='none'),'Escape deselects and hides the dossier');
   console.log('ERRORS',errs);ok(errs.length===0,'no console errors or warnings');
   await b.close();
 })();

@@ -69,8 +69,9 @@
       </div>
     </div>
     <div id="planBanner"></div>
+    <div id="pickBanner" role="status"></div>
     <div id="gauges"></div>
-    <div class="cs-head"><div><b>Consist</b><span id="csHint">Front → rear. Drag cars to reorder; drop a shipment on a car to load it. Click a car to edit cargo, shift-click for several.</span></div><span class="num" id="csSum"></span></div>
+    <div class="cs-head"><div><b>Consist</b><span id="csHint"><span class="dk">Front → rear. Drag cars to reorder; drop a shipment on a car to load it. Click a car to edit cargo, shift-click for several.</span><span class="mb">Front → rear. Tap a car to edit cargo; long-press to select several. Tap a spare or shipment, then a car, to place it.</span></span></div><span class="num" id="csSum"></span></div>
     <div id="consist"><div id="brackets"></div><div id="strip"></div><div id="stripMarks"></div><div id="bars"></div><div class="cap" id="barCap"></div></div>
   </section>
   <section id="drawer">
@@ -86,6 +87,7 @@
   <div id="sendBar"></div>
 </aside>
 <aside id="yardSide" aria-label="Simulation variables">
+  <div class="sheet-head"><span class="grab" aria-hidden="true"></span><b id="sheetTitle">Variables</b><button id="sheetClose">Done</button></div>
   <div class="ph"><div class="row"><h2>Variables</h2><button id="defaultsBtn">Defaults</button></div><div class="k" id="chgK">Run 01 · all defaults</div></div>
   <div class="grp" id="faultsGrp"><div class="k fk"><span>Faults <span id="fCount" class="fcount">none</span></span><span class="fk-r"><button id="fPick" aria-pressed="false" title="Click an element on the map to fault it (or right-click the map)">Pick on map</button><button id="fClearAll" disabled>Clear all</button></span></div>
     <div class="fadd">
@@ -116,4 +118,6 @@
     <div class="rdesc" id="ruleDesc"></div>
   </div>
 </aside>
+<nav id="mtabs" aria-label="Sections"><button data-mt="map" class="on">Map</button><button data-mt="metrics">Metrics</button><button data-mt="faults">Faults<i id="mtFault"></i></button><button data-mt="vars">Variables</button></nav>
+<div id="scrim"></div>
 </div>

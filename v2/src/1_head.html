@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <title>Yard Control · Blockline</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1013">
 <style>
 /*@FONTS@*/
 /* ---------- tokens ---------- */
@@ -472,4 +473,160 @@ table.dt{width:100%;border-collapse:collapse;font-size:var(--fs-meta)}
 #sendBar .conf .row{display:flex;gap:var(--s-2)}
 #sendBar .sent{font-size:var(--fs-meta);color:var(--fg-2);line-height:1.5}
 #sendBar .sent b{color:var(--fg)}
+
+/* dossier only exists while something is selected */
+#dossier:not(.sel){display:none}
+#csHint .mb{display:none}
+.dz-x{display:none}
+/* ---------- mobile-only chrome (hidden on desktop) ---------- */
+#mtabs,#scrim,.sheet-head,#pickBanner:empty{display:none}
+#pickBanner{margin-top:var(--s-2);font-size:var(--fs-meta);color:var(--fg);border:1px solid var(--cobalt);background:var(--cobalt-a);border-radius:var(--r-1);padding:6px var(--s-3);display:flex;gap:var(--s-3);align-items:center}
+#pickBanner .grow{flex:1}#pickBanner .why{color:var(--red)}
+.car.pick{border-color:var(--cobalt);box-shadow:inset 0 0 0 1px var(--cobalt)}
+.car.endslot{border-style:dashed;color:var(--fg-3);display:grid;place-items:center;font-size:var(--fs-label);cursor:pointer}
+tr.picked td{background:var(--cobalt-a)!important}
+/* ---------- MOBILE: phones portrait (≤820 wide) and landscape (≤520 tall) ---------- */
+@media (max-width:820px),(max-height:520px){
+  html,body{overscroll-behavior:none}
+  #app{display:flex;flex-direction:column;min-width:0;min-height:0;height:100vh;height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  header{flex:none;height:calc(46px + env(safe-area-inset-top));padding:env(safe-area-inset-top) var(--s-3) 0;gap:var(--s-2)}
+  .org,.prov{display:none}
+  .product{font-size:14px;white-space:nowrap}
+  .viewseg{margin-left:auto}.viewseg button{height:36px;padding:0 var(--s-3)}
+  header .grow{display:none}
+  .live{height:32px;padding:0 var(--s-2);white-space:nowrap}
+  button,.seg button,.layers button{min-height:40px}
+  .sw,header button,#legendWrap button.x,.car,.selchips button{min-height:0!important}
+  .viewseg button{height:34px!important}
+  .map-head>div:first-child{flex:1 1 180px}
+  .map-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* yard */
+  #left{display:flex;flex-direction:column;flex:1;min-height:0}
+  #outcomes{flex:none;padding:var(--s-2) var(--s-3);overflow-x:auto;scrollbar-width:none}
+  #outcomes::-webkit-scrollbar{display:none}
+  .tiles{display:flex;gap:0}
+  .tile{flex:none;min-width:128px;padding:0 var(--s-3)}
+  .tile .val{margin:2px 0 0}.tile .val b{font-size:20px}
+  .tile .sub{max-width:150px}
+  #mapwrap{flex:1;min-height:0;display:flex;flex-direction:column}
+  .map-head{flex:none;flex-wrap:wrap;gap:2px var(--s-2);padding:var(--s-1) var(--s-3)}
+  .map-title{font-size:var(--fs-body)}
+  .map-sub{display:none}
+  .map-dock{min-height:0}
+  .layers{overflow-x:auto;max-width:100%;scrollbar-width:none}
+  .layers button{height:40px;padding:0 var(--s-2)}
+  #mapbox{flex:1;min-height:180px;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+  #zoomctl{top:var(--s-2);right:var(--s-2)}
+  #zoomctl button{width:44px;height:44px}
+  #cedit .flag,.bulk .flag{min-height:40px}
+  #zoomctl #zFit{min-width:44px}
+  #mini{display:none!important}
+  #legendWrap{right:var(--s-2);bottom:var(--s-2)}
+  #legendBtn{min-height:40px;min-width:40px}
+  #dossier.sel{left:var(--s-2)!important;right:var(--s-2);top:auto!important;bottom:var(--s-2);width:auto;max-height:46%!important;z-index:4}
+  .dz-x{display:grid;place-items:center;position:absolute;top:4px;right:4px;width:40px;height:40px;font-size:20px;color:var(--fg-2);border-radius:var(--r-1)}
+  #fpop{position:fixed;left:var(--s-2)!important;right:var(--s-2);top:auto!important;bottom:calc(var(--s-2) + env(safe-area-inset-bottom));z-index:60;padding:var(--s-2)}
+  #fpop button{min-height:44px;font-size:var(--fs-body)}
+  #bottom{flex:none;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 84px}
+  .transport{flex-direction:row;align-items:center;justify-content:space-between;gap:var(--s-2);padding:var(--s-1) var(--s-3);border-right:0;border-bottom:1px solid var(--line)}
+  .trow{gap:var(--s-2)}
+  #play{width:44px;height:44px}
+  #stepBtn{display:none}
+  .cbtn{width:44px;height:44px}
+  .clock .k{display:none}
+  #speedSeg button{min-width:40px;padding:0 var(--s-2)}
+  .rbtn{height:40px;margin-left:var(--s-1)}
+  .tl{padding:var(--s-1) var(--s-3) 0}
+  .tl-head .lg,.tl-head .hint{display:none}
+  #liveBtn{min-height:32px}
+  #mtabs{display:flex;flex:none;border-top:1px solid var(--line);background:var(--bg-1);padding-bottom:env(safe-area-inset-bottom)}
+  #mtabs button{flex:1;height:52px;font-size:var(--fs-meta);color:var(--fg-3);position:relative}
+  #mtabs button.on{color:var(--fg);box-shadow:inset 0 2px 0 var(--fg)}
+  #mtabs i{position:absolute;top:12px;margin-left:4px;width:6px;height:6px;border-radius:50%;background:var(--red);display:none}
+  #mtabs i.on{display:inline-block}
+  #app.asm #mtabs{display:none}
+  /* bottom sheets: faults / variables (the yard aside) and metrics */
+  #scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:39}
+  #app.sheet #scrim{display:block}
+  #yardSide{position:fixed;left:0;right:0;bottom:0;max-height:74vh;max-height:74dvh;z-index:40;border-left:0;border-top:1px solid var(--line-3);border-radius:12px 12px 0 0;box-shadow:var(--shadow-overlay);
+    transform:translateY(105%);transition:transform var(--dur-3) var(--ease-out);padding-bottom:env(safe-area-inset-bottom);visibility:hidden}
+  #app.sheet-faults #yardSide,#app.sheet-vars #yardSide{transform:none;visibility:visible}
+  #app.sheet-faults #yardSide>.ph,#app.sheet-faults #yardSide>.grp:not(#faultsGrp){display:none}
+  #app.sheet-vars #yardSide #faultsGrp{display:none}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;background:var(--bg-1);padding:var(--s-3) var(--s-4) var(--s-2);border-bottom:1px solid var(--line)}
+  .sheet-head .grab{position:absolute;left:50%;top:5px;width:36px;height:4px;border-radius:2px;background:var(--line-3);transform:translateX(-50%)}
+  .sheet-head b{font-size:var(--fs-title)}
+  .sheet-head button{min-height:40px;padding:0 var(--s-3);color:var(--fg-2);border:1px solid var(--line-2);border-radius:var(--r-1)}
+  #yardSide select,#yardSide .finj,#yardSide .fbtn,#yardSide #fPick,#yardSide #fClearAll{min-height:40px}
+  #yardSide .frow button{min-width:40px;min-height:40px}
+  input[type=range]{height:40px}
+  .sw{width:44px;height:26px}.sw::after{top:5px;left:5px;width:16px;height:16px}.sw.on::after{transform:translateX(18px)}
+  #app.sheet-metrics #outcomes{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--bg-1);border-top:1px solid var(--line-3);border-radius:12px 12px 0 0;padding:var(--s-4) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));overflow:visible;box-shadow:var(--shadow-overlay)}
+  #app.sheet-metrics .tiles{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-4) 0}
+  #app.sheet-metrics .tile{min-width:0;border-left:0;padding:0}
+  #app.sheet-metrics .tile .val b{font-size:var(--fs-metric)}
+  #app.sheet-metrics .tile .sub{max-width:none;white-space:normal}
+  /* assembly: one vertical scroll, sticky send bar */
+  #app.asm{overflow-y:auto;overflow-x:hidden;display:block}
+  #app.asm header{position:sticky;top:0;z-index:25;display:flex}
+  #app.asm #asm{display:block;overflow:visible}
+  #app.asm #asmSide{display:flex;flex-direction:column;border-left:0;border-top:1px solid var(--line)}
+  #sideMain{overflow:visible;flex:none}
+  #asmSide{padding-bottom:150px}
+  #csHint .dk{display:none}#csHint .mb{display:inline}
+  #sendBar{position:fixed;left:0;right:0;bottom:0;max-height:55dvh;overflow-y:auto;box-shadow:0 -8px 24px rgba(0,0,0,.45);z-index:15;padding-left:calc(var(--gutter) + env(safe-area-inset-left));padding-right:calc(var(--gutter) + env(safe-area-inset-right));background:var(--bg-1);padding-bottom:calc(var(--s-3) + env(safe-area-inset-bottom))}
+  #sendBar button{height:44px}
+  #slots,#planSec{padding-left:var(--s-3);padding-right:var(--s-3)}
+  #slotBody{overflow-x:auto}
+  .sl-in{position:relative;min-width:620px}
+  .plan-head{align-items:flex-start}
+  .ph-l,.ph-r{flex-wrap:wrap;gap:var(--s-2)}
+  #planLine{white-space:normal;flex-basis:100%}
+  .stepper{height:40px}.stepper button{width:40px}
+  #gauges,#gauges.g8{grid-template-columns:1fr;gap:0}
+  .gg{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:var(--s-3);padding:6px 0;border-bottom:1px solid var(--line)}
+  .gg .gk{font-size:var(--fs-meta);color:var(--fg-2)}
+  .gg .gv{grid-column:2;grid-row:1/3;margin:0;align-self:center;text-align:right}
+  .gg .gs{grid-column:1}
+  .gg .gbar{display:none}
+  .cs-head{flex-wrap:wrap}
+  #csHint{display:block;margin:2px 0 0!important}
+  #consist{overflow-x:auto;overflow-y:hidden;padding-bottom:var(--s-2);-webkit-overflow-scrolling:touch}
+  #drawer{min-height:0}
+  .dr-tabs{padding:0 var(--s-3);overflow-x:auto}
+  .dr-tabs>button{height:44px;white-space:nowrap}
+  .dr-hint{display:none}
+  #drBody{overflow-x:auto;padding:var(--s-2) var(--s-3)}
+  table.dt{min-width:640px}
+  .dt td{padding:9px 6px}
+  .qwrap{grid-template-columns:minmax(0,1fr)}
+  .chipb{height:40px}
+  .ghost{height:40px}.prim{height:44px}
+  .iss .fix{min-height:40px}
+  #cedit{position:fixed;left:0!important;right:0;top:auto!important;bottom:0;width:auto;max-height:84vh;max-height:84dvh;overflow-y:auto;border-radius:12px 12px 0 0;z-index:50;padding:var(--s-4) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom))}
+  #cedit.open{grid-template-columns:minmax(0,1fr)}
+  #cedit .eh{grid-column:1;flex-wrap:wrap}
+  #cedit .chips .chipb{height:36px}
+  #pickBanner{position:sticky;top:calc(46px + env(safe-area-inset-top));z-index:20}
+  #pickBanner button{min-height:36px}
+}
+/* phones in landscape: tab rail on the right, metrics strip in its sheet, one-row transport */
+@media (max-height:520px) and (orientation:landscape){
+  #app:not(.asm){display:grid;grid-template-columns:minmax(0,1fr) calc(64px + env(safe-area-inset-right));grid-template-rows:auto minmax(0,1fr);padding-right:0}
+  #app:not(.asm) header{grid-column:1/3}
+  header{height:calc(40px + env(safe-area-inset-top))}
+  #outcomes{display:none}
+  #app.sheet-metrics #outcomes{display:block;left:auto;right:calc(64px + env(safe-area-inset-right));width:min(440px,80vw)}
+  #left{grid-column:1;grid-row:2}
+  #mtabs{grid-column:2;grid-row:2;flex-direction:column;border-top:0;border-left:1px solid var(--line);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) 0}
+  #mtabs button{height:auto;flex:1}
+  #mtabs button.on{box-shadow:inset 2px 0 0 var(--fg)}
+  .map-head{flex-wrap:nowrap}
+  #bottom{grid-template-columns:auto minmax(0,1fr);grid-template-rows:64px}
+  .transport{border-bottom:0;border-right:1px solid var(--line)}
+  .tl-head{display:none}.tl{grid-template-rows:minmax(0,1fr);padding:var(--s-1) var(--s-3)}
+  #yardSide{left:auto;right:calc(64px + env(safe-area-inset-right));width:min(440px,80vw);max-height:92vh;max-height:92dvh}
+  #dossier.sel{right:auto;width:280px;max-height:80%!important}
+  #pickBanner{top:calc(40px + env(safe-area-inset-top))}
+}
 </style></head>

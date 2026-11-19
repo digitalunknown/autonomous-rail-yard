@@ -1,6 +1,6 @@
 // ================= ASSEMBLY UI (defined here, initialised from 5_ui once $ exists). UI-only state lives in AUI; plan data in S.asm.
 let VIEW='yard';
-const AUI={plan:'PL-52',mode:'cur',tab:'spares',sel:new Set(),edit:null,draft:null,bulk:null,qf:{dest:'all',due:true,type:'all'},spareAll:false,aa:null,confirm:false,collapsed:false,rulesOpen:false,sig:'',flash:''};
+const AUI={pick:null,plan:'PL-52',mode:'cur',tab:'spares',sel:new Set(),edit:null,draft:null,bulk:null,qf:{dest:'all',due:true,type:'all'},spareAll:false,aa:null,confirm:false,collapsed:false,rulesOpen:false,sig:'',flash:''};
 let DRAG=null;
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function curPlan(){return S.asm.plans.find(p=>p.id===AUI.plan)||S.asm.plans[0];}
@@ -18,6 +18,7 @@ function renderAsm(force){if(VIEW!=='asm'||!S||!S.asm)return;if(DRAG&&DRAG.live)
   const sig=hashStr(JSON.stringify(S.asm))+'|'+Math.floor(S.t/30)+'|'+isReplay()+'|'+running;
   if(!force&&sig===AUI.sig)return;AUI.sig=sig;
   for(const id of [...AUI.sel])if(!pl.cars.includes(id))AUI.sel.delete(id);
+  if(AUI.pick&&!editable(pl))AUI.pick=null;
   const R=S.asm.rules,c=planChecks(pl,R);let sg=null;
   if(editable(pl)){sg=suggest(pl,R);}
   const view=AUI.mode==='sug'&&sg&&sg.changes.length?{c:sg.after,cars:sg.cars,cargo:sg.cargo,changed:changedSet(pl,sg)}:{c,cars:pl.cars,cargo:null,changed:null};
@@ -30,7 +31,7 @@ function renderSlots(pl,c){const t0=Math.floor((S.t-1800)/900)*900,t1=t0+9000;co
   $('slotMeta').textContent=`Today ${clk(t0)}–${clk(t1)} · ${pl.id} ${pl.status==='departed'?'left '+trk(pl.fromD||pl.dtrack)+' at '+clk(pl.actualT):'holds '+trk(pl.dtrack)+' at '+clk(pl.dep)}`+(chOutF?` · ${trk(chOutF.target)} out since ${clk(chOutF.a)}`:'');
   $('slotCollapse').textContent=AUI.collapsed?'Expand':'Collapse';$('slots').classList.toggle('collapsed',AUI.collapsed);$('slotCollapse').setAttribute('aria-expanded',!AUI.collapsed);
   if(AUI.collapsed)return;
-  let h='<div class="sl-axis">';for(let t=t0;t<=t1;t+=900)h+=`<span style="left:${X(t)}%">${clk(t)}</span>`;h+='</div>';
+  let h='<div class="sl-in"><div class="sl-axis">';for(let t=t0;t<=t1;t+=900)h+=`<span style="left:${X(t)}%">${clk(t)}</span>`;h+='</div>';
   const bar=(a,b,cls,txt,title)=>`<div class="sl-bar ${cls}" style="left:calc(${X(b)}% - max(${X(b)-X(a)}%,58px));width:max(${X(b)-X(a)}%,58px)" title="${esc(title||txt)}">${esc(txt)}</div>`;
   for(const d of D_IDS){let lane='';
     for(const q of Object.values(S.pl))if(q.kind==='out'&&(q.dtrack===d)&&!q.plan){const end=q.state==='assembling'?q.departT:S.t+ASSEMBLE+300;lane+=bar(Math.max(t0,q.arrT||S.t),end,'live',`${q.id} ${clk(end)} · ${q.veh.length}`,`${q.id} · ${q.veh.length} vehicles · ${q.state}`);}
@@ -48,7 +49,7 @@ function renderSlots(pl,c){const t0=Math.floor((S.t-1800)/900)*900,t1=t0+9000;co
       if(n)lane+=bar(S.t-600,S.t+1200,'',`${n} charging${own.length?' · '+own.map(v=>v.id).join(', ')+' planned':''}`);}
     h+=`<div class="sl-row" data-ch="${T.id}"><div>${T.id}</div><div class="sl-lane">${lane}</div></div>`;}
   h+=`<div class="sl-now" style="left:calc(72px + (100% - 72px) * ${X(S.t)/100})"><span>${clk(S.t)}</span></div>`;
-  $('slotBody').innerHTML=h;}
+  $('slotBody').innerHTML=h+'</div>';}
 function renderPlanHead(pl,c,sg){
   $('planSeg').innerHTML=S.asm.plans.map(p=>`<button data-p="${p.id}" class="${p.id===pl.id?'on':''}" title="${esc(routeTxt(p)+' · '+p.status)}">${p.id}</button>`).join('')+`<button class="add" id="newPlan" title="Start an empty plan">+ New</button>`;
   const n=c.ok.length,loaded=c.ok.filter(r=>r.load>0).length,m=minsTo(pl.dep);
@@ -81,17 +82,21 @@ function renderGauges(pl,c){const R=S.asm.rules;let h='';const lenV=c.length>c.l
   const op=c.open.length;if(op)h+=gauge('Open cargo',`${op} shipment${op>1?'s':''}`,c.open.map(s=>s.id).join(', ')+' has no car','w');
   $('gauges').innerHTML=h;$('gauges').classList.toggle('g8',!!op);}
 function renderConsist(pl,view){const c=view.c,R=S.asm.rules;const strip=$('strip');const W=Math.max(400,strip.clientWidth||($('consist').clientWidth)||900);
-  const maxM=Math.max(c.length,c.limit)*1.02+2;const k=(W-96)/maxM;AUI.k=k;
+  const maxM=Math.max(c.length,c.limit)*1.02+2;const mob=isMobile();const k=mob?6:(W-96)/maxM;AUI.k=k;
+  for(const id of ['brackets','strip','stripMarks','bars'])$(id).style.width=mob?Math.round(maxM*k+(AUI.pick&&AUI.pick.kind!=='shp'?70:96))+'px':'';
   $('csSum').textContent=`${fx(c.length)} m · ${fx(c.gross)} t`;
   // block brackets
   let bk='';let i=0;const rows=c.ok;while(i<rows.length){let j=i;while(j+1<rows.length&&rows[j+1].block===rows[i].block)j++;const a=c.pos[rows[i].id][0],b=c.pos[rows[j].id][1];
     const bad=rows.slice(i,j+1).some(r=>c.bf.includes(r.id));bk+=`<div class="bk ${bad?'bad':''}" style="left:${a*k}px;width:${(b-a)*k}px">${rows[i].block} ×${j-i+1}</div>`;i=j+1;}
   $('brackets').innerHTML=bk;
   let h='';for(const r of rows){const st=c.st[r.id]||'';const x=c.pos[r.id][0]*k,w=r.len*k-2;const sel=AUI.sel.has(r.id)||AUI.edit===r.id;
-    const lo=r.soc<R.floor||r.arr<0;h+=`<div class="car ${st} ${sel?'sel':''} ${r.load?'':'empty'} ${view.changed&&view.changed.has(r.id)?'chg':''}" data-car="${r.id}" ${editable(pl)&&AUI.mode!=='sug'?'data-drag="car"':''} style="left:${x}px;width:${w}px" title="${esc(r.id+' · '+r.ct+' · '+cargoName(r.cargo)+' · '+fx(r.gross)+' t · '+Math.round(r.soc)+'%')}">
+    const lo=r.soc<R.floor||r.arr<0;const pk=AUI.pick&&AUI.pick.kind==='shp'?(dropReason(S.asm.queue.find(q=>q.id===AUI.pick.id)||{type:'i20',dest:''},r.id)?'':'drop-ok'):AUI.pick&&AUI.pick.id===r.id?'pick':'';
+    h+=`<div class="car ${st} ${pk} ${sel?'sel':''} ${r.load?'':'empty'} ${view.changed&&view.changed.has(r.id)?'chg':''}" data-car="${r.id}" ${editable(pl)&&AUI.mode!=='sug'?'data-drag="car"':''} style="left:${x}px;width:${w}px" title="${esc(r.id+' · '+r.ct+' · '+cargoName(r.cargo)+' · '+fx(r.gross)+' t · '+Math.round(r.soc)+'%')}">
       <div class="ci">${r.id}</div><div class="cc">${esc(cargoShort(r.cargo))}</div><div class="cn"><span>${fx(r.gross)} t</span><span class="${lo?'lo':''}">${Math.round(r.soc)}%</span></div></div>`;}
   for(const r of c.rows.filter(r=>r.missing))h+='';
+  if(AUI.pick&&AUI.pick.kind!=='shp'&&editable(pl)){const x=rows.length?(c.pos[rows[rows.length-1].id][1]+CAR_GAP)*k:0;h+=`<div class="car endslot" data-end="1" style="left:${x}px;width:56px">End</div>`;}
   h+='<div class="ins" id="insMark"></div>';strip.innerHTML=h;
+  renderPick(pl);
   let mk=`<div class="lim ${c.length>c.limit?'':'ok'}" style="left:${c.limit*k}px"><span>${trk(pl.dtrack)} limit ${c.limit} m</span></div>`;
   for(const [a,b] of c.haz){const x=(c.pos[rows[a].id][1]+CAR_GAP/2)*k;mk+=`<div class="hzm" style="left:${x}px"><span>Cl ${rows[a].cls} next to Cl ${rows[b].cls}, no buffer</span></div>`;}
   $('stripMarks').innerHTML=mk;
@@ -118,7 +123,7 @@ function renderDrawer(pl,c){const ed=editable(pl);
   if(AUI.tab==='spares'){$('drHint').textContent=ed?'Drag a spare onto the consist, or press Add':'Plan is locked';
     let h=`<div class="dfil"><button class="chipb ${AUI.spareAll?'':'on'}" data-sf="plan">${pl.blocks.join(' + ')||'Plan'} blocks</button><button class="chipb ${AUI.spareAll?'on':''}" data-sf="all">All inventory</button><span class="k">Live yard inventory: staged, bowl and charging cars not in a plan</span></div>`;
     h+=`<table class="dt"><thead><tr><th></th><th>ID</th><th>Type</th><th>Length</th><th>Tare</th><th>Battery</th><th>Block</th><th>Track</th><th>Status</th><th></th></tr></thead><tbody>`;
-    for(const r of sp){const v=r.v;h+=`<tr class="${r.off?'off':''}" ${ed&&!r.off?`data-drag="spare" data-id="${v.id}"`:''}><td class="grip">${ed&&!r.off?'⠿':''}</td><td class="id">${v.id}</td><td>${r.ct}</td><td class="n">${CTYPES[r.ct].len} m</td><td class="n">${CTYPES[r.ct].tare} t</td>
+    for(const r of sp){const v=r.v;h+=`<tr class="${r.off?'off':''} ${AUI.pick&&AUI.pick.id===v.id?'picked':''}" ${ed&&!r.off?`data-drag="spare" data-id="${v.id}"`:''}><td class="grip">${ed&&!r.off?'⠿':''}</td><td class="id">${v.id}</td><td>${r.ct}</td><td class="n">${CTYPES[r.ct].len} m</td><td class="n">${CTYPES[r.ct].tare} t</td>
       <td class="n"><span class="socb ${v.soc<S.asm.rules.floor?'lo':''}"><i style="width:${v.soc}%"></i></span>${Math.round(v.soc)}%</td><td class="n">${blockOf(v)}</td><td class="n">${r.tr}</td><td>${esc(r.status)}</td>
       <td>${ed&&!r.off?`<button class="ghost" data-add="${v.id}">Add</button>`:''}</td></tr>`;}
     if(!sp.length)h+=`<tr><td colspan="10" class="empty-note">No spare cars for ${pl.blocks.join(' or ')} right now.</td></tr>`;
@@ -131,7 +136,7 @@ function renderDrawer(pl,c){const ed=editable(pl);
     <button class="chipb ${f.due?'on':''}" data-qdue="1">Due by ${clk(pl.dep)}</button><select class="rsel" id="qType" aria-label="Cargo type"><option value="all">Any type</option>${types.map(t=>`<option value="${t}" ${f.type===t?'selected':''}>${CARGO[t].name}</option>`).join('')}</select>
     <span class="k">${q.length} waiting · ${shown.length} shown${later?` · ${later} later hidden`:''}</span></div><div class="qwrap"><div><table class="dt"><thead><tr><th></th><th>Shipment</th><th></th><th></th><th style="text-align:right">T</th><th style="text-align:right">Due</th></tr></thead><tbody>`;
   const placed=AUI.aa?new Set(AUI.aa.placed.map(p=>p.shp.id)):new Set();
-  for(const s of shown){h+=`<tr ${ed?`data-drag="shp" data-id="${s.id}"`:''} class="${placed.has(s.id)?'in':''}"><td class="grip">${ed?'⠿':''}</td><td class="id">${s.id}</td><td>${esc(s.desc)}<span class="sub">KFL → ${s.dest}</span></td>
+  for(const s of shown){h+=`<tr ${ed?`data-drag="shp" data-id="${s.id}"`:''} class="${placed.has(s.id)?'in':''} ${AUI.pick&&AUI.pick.id===s.id?'picked':''}"><td class="grip">${ed?'⠿':''}</td><td class="id">${s.id}</td><td>${esc(s.desc)}<span class="sub">KFL → ${s.dest}</span></td>
     <td style="color:var(--fg-3)">${s.from?(s.rem?'trimmed':'from '+s.from):esc(s.note||'')}</td><td class="n" style="text-align:right">${fx(s.t)} t</td><td class="n" style="text-align:right">${clk(s.due)}</td></tr>`;}
   if(!shown.length)h+=`<tr><td colspan="6" class="empty-note">Nothing waiting${f.due?' for this departure':''}.</td></tr>`;
   h+='</tbody></table></div><div class="aap">';
@@ -238,11 +243,12 @@ function renderEditor(part){const pl=curPlan(),id=AUI.edit,v=vById(id);if(!v||!p
     <tr><td>Rear ${nR===6?'six':nR} cars</td><td class="n">${fx(rear(c0))} t →</td><td class="n"><b>${fx(rear(c1))} t</b></td></tr>
     ${r1.reef||r0.reef?`<tr><td>Arrives ${pl.to} at</td><td class="n ${r0.arr<0?'w':''}">${Math.round(r0.arr)}% →</td><td class="n"><b class="${r1.arr<0?'w':''}">${Math.round(r1.arr)}%</b></td></tr>`:''}</table>
     <div class="enote">${esc(note)}</div>
-    <div class="eact">${ed?'<button class="rm" id="eRemove">Remove from consist</button>':''}<button class="ghost" id="eCancel">${ed?'Cancel':'Close'}</button>${ed?`<button class="prim" id="eApply">Apply to ${id}</button>`:''}</div></div>`;
+    <div class="eact">${ed?'<button class="rm" id="eRemove">Remove from consist</button><button class="ghost" id="eMove" title="Then tap where it goes">Move…</button>':''}<button class="ghost" id="eCancel">${ed?'Cancel':'Close'}</button>${ed?`<button class="prim" id="eApply">Apply to ${id}</button>`:''}</div></div>`;
   if(part==='eff'&&$('ceR')){const tmp=document.createElement('div');tmp.innerHTML=html;$('ceR').innerHTML=tmp.querySelector('#ceR').innerHTML;
     $('eLoadLbl').textContent=`${fx(D.t)} of ${fx(ml)} t`;$('eLoadN').value=D.t.toFixed(1)+' t';$('eFillCap').textContent=`${Math.round(D.t/ml*100)}% of ${ct.toLowerCase()} capacity`;paintSlider($('eLoad'));return;}
   e.innerHTML=html;e.classList.add('open');
   // place under the strip, near the car
+  if(isMobile()){const sl=$('eLoad');if(sl)paintSlider(sl);return;}
   const host=$('asm').getBoundingClientRect(),car=document.querySelector(`.car[data-car="${id}"]`);const cr=car?car.getBoundingClientRect():$('strip').getBoundingClientRect();
   const w=700;let x=cr.left-host.left+cr.width/2-w/2;x=Math.max(16,Math.min(host.width-w-16,x));const y=$('bars').getBoundingClientRect().bottom-host.top+$('asm').scrollTop+6;
   e.style.left=x+'px';e.style.top=y+'px';const sl=$('eLoad');if(sl)paintSlider(sl);
@@ -263,9 +269,11 @@ function showIns(idx){const m=$('insMark');if(!m)return;const cars=[...document.
   const sr=$('strip').getBoundingClientRect();let x;if(idx<cars.length)x=cars[idx].getBoundingClientRect().left-sr.left-2;else if(cars.length){const r=cars[cars.length-1].getBoundingClientRect();x=r.right-sr.left+2;}else x=0;
   m.style.display='block';m.style.left=x+'px';}
 function overConsist(x,y){const r=$('consist').getBoundingClientRect();return x>=r.left-10&&x<=r.right+10&&y>=r.top-24&&y<=r.bottom+10;}
-function onAsmDown(e){if(e.button!==0)return;const el=e.target.closest('[data-drag]');if(!el||e.target.closest('button,input,select'))return;
-  DRAG={kind:el.dataset.drag,id:el.dataset.id||el.dataset.car,x0:e.clientX,y0:e.clientY,el,live:false,shift:e.shiftKey};e.preventDefault();}
-function onAsmMove(e){if(!DRAG)return;const d=Math.hypot(e.clientX-DRAG.x0,e.clientY-DRAG.y0);if(!DRAG.live){if(d<5)return;DRAG.live=true;closeEditor();if(DRAG.kind==='car')DRAG.el.classList.add('dragging');}
+function onAsmDown(e){if(e.button!==0)return;const el=e.target.closest('[data-drag],[data-car]');if(!el||e.target.closest('button,input,select'))return;
+  const touch=e.pointerType!=='mouse';DRAG={kind:el.dataset.drag||'car',id:el.dataset.id||el.dataset.car,x0:e.clientX,y0:e.clientY,el,live:false,shift:e.shiftKey,touch,nodrag:!el.dataset.drag};
+  if(touch&&el.dataset.car&&editable(curPlan())){const id=el.dataset.car;DRAG.lp=setTimeout(()=>{if(!DRAG||DRAG.id!==id)return;DRAG=null;closeEditor();if(AUI.sel.has(id))AUI.sel.delete(id);else AUI.sel.add(id);renderAsm(true);},480);}
+  if(!touch)e.preventDefault();}
+function onAsmMove(e){if(!DRAG)return;const d=Math.hypot(e.clientX-DRAG.x0,e.clientY-DRAG.y0);if(DRAG.touch||DRAG.nodrag){if(d>10){clearTimeout(DRAG.lp);if(DRAG.touch)DRAG=null;else DRAG.moved=true;}return;}if(!DRAG.live){if(d<5)return;DRAG.live=true;closeEditor();if(DRAG.kind==='car')DRAG.el.classList.add('dragging');}
   const g=$('dragGhost');g.style.display='block';g.style.left=(e.clientX+12)+'px';g.style.top=(e.clientY+10)+'px';
   document.querySelectorAll('.car.drop-ok,.car.drop-no').forEach(c=>c.classList.remove('drop-ok','drop-no'));DRAG.target=null;
   if(DRAG.kind==='shp'){const s=S.asm.queue.find(q=>q.id===DRAG.id);g.style.display='none';const hit=document.elementFromPoint(e.clientX,e.clientY);g.style.display='block';
@@ -275,7 +283,9 @@ function onAsmMove(e){if(!DRAG)return;const d=Math.hypot(e.clientX-DRAG.x0,e.cli
   const id=DRAG.id;g.innerHTML=`<b>${id}</b><span>${DRAG.kind==='car'?'Move in consist · drop on the drawer to remove':'Add to consist'}</span>`;
   if(overConsist(e.clientX,e.clientY)){const idx=insIndex(e.clientX);DRAG.target=idx;showIns(idx);}else{showIns(null);
     if(DRAG.kind==='car'&&e.clientY>$('drawer').getBoundingClientRect().top){DRAG.target='remove';g.innerHTML=`<b>${id}</b><span class="why">Remove from ${curPlan().id}</span>`;}}}
-function onAsmUp(e){if(!DRAG)return;const D=DRAG;DRAG=null;$('dragGhost').style.display='none';
+function onAsmUp(e){if(!DRAG)return;const D=DRAG;DRAG=null;clearTimeout(D.lp);$('dragGhost').style.display='none';if(D.moved)return;
+  if(!D.live&&AUI.pick&&D.kind==='car'){placeAt(D.id);return;}
+  if(!D.live&&(D.kind==='spare'||D.kind==='shp')){AUI.pick=AUI.pick&&AUI.pick.id===D.id?null:{kind:D.kind,id:D.id};AUI.flash='';closeEditor();renderAsm(true);return;}
   if(!D.live){if(D.kind==='car'){if(D.shift){AUI.edit=null;if(AUI.sel.has(D.id))AUI.sel.delete(D.id);else AUI.sel.add(D.id);closeEditor();renderAsm(true);}else{if(AUI.edit===D.id){closeEditor();renderAsm(true);}else openEditor(D.id);}}return;}
   const pl=curPlan();
   if(D.kind==='shp'&&D.target){const id=D.target;commitAsm(()=>{assignShp(D.id,id,pl);});return;}
@@ -283,6 +293,16 @@ function onAsmUp(e){if(!DRAG)return;const D=DRAG;DRAG=null;$('dragGhost').style.
   if(D.kind==='car'&&typeof D.target==='number'){const from=pl.cars.indexOf(D.id);let to=D.target;if(to>from)to--;if(to!==from)commitAsm(()=>{const a=pl.cars.filter(x=>x!==D.id);a.splice(to,0,D.id);pl.cars=a;});else renderAsm(true);return;}
   if(D.kind==='spare'&&typeof D.target==='number'){commitAsm(()=>{pl.cars.splice(D.target,0,D.id);});return;}
   renderAsm(true);}
+// tap-to-place: pick a shipment / spare / car, then tap a car (it goes in front of that car) or End
+function renderPick(pl){const el=$('pickBanner');const P_=AUI.pick;if(!P_||!editable(pl)){el.innerHTML='';return;}
+  let t='';if(P_.kind==='shp'){const s=S.asm.queue.find(q=>q.id===P_.id);if(!s){AUI.pick=null;el.innerHTML='';return;}t=`Tap a highlighted car to load <b>${s.id}</b> (${fx(s.t)} t, ${esc(s.desc)})`;}
+  else t=`Tap a car to put <b>${P_.id}</b> in front of it, or tap End`;
+  el.innerHTML=`<span>${t}${AUI.flash?` <span class="why">· ${esc(AUI.flash)}</span>`:''}</span><span class="grow"></span><button class="ghost" id="pickCancel">Cancel</button>`;}
+function placeAt(target){const pl=curPlan(),P_=AUI.pick;if(!P_||!editable(pl))return;
+  if(P_.kind==='shp'){if(target==='end')return;const s=S.asm.queue.find(q=>q.id===P_.id);const why=s?dropReason(s,target):'Shipment is gone';if(why){AUI.flash=why;renderAsm(true);return;}
+    AUI.pick=null;AUI.flash='';commitAsm(()=>{assignShp(P_.id,target,pl);});return;}
+  if(P_.kind==='car'&&target===P_.id){AUI.pick=null;renderAsm(true);return;}
+  AUI.pick=null;AUI.flash='';commitAsm(()=>{const a=pl.cars.filter(x=>x!==P_.id);let to=target==='end'?a.length:a.indexOf(target);if(to<0)to=a.length;a.splice(to,0,P_.id);pl.cars=a;});}
 // ---------- actions
 function newPlan(){let n=53;while(S.asm.plans.some(p=>p.id==='PL-'+n)||S.pl['PL-'+n])n++;const id='PL-'+n;
   const used=new Set(S.asm.plans.filter(p=>p.status!=='departed').map(p=>p.dtrack));const d=D_IDS.find(x=>!used.has(x))||'D01';
@@ -294,10 +314,13 @@ function initAsmUI(){
   $('slotCollapse').onclick=()=>{AUI.collapsed=!AUI.collapsed;renderAsm(true);};
   $('rulesBtn').onclick=()=>{AUI.rulesOpen=!AUI.rulesOpen;renderAsm(true);};
   const A=$('asm'),SD=$('asmSide');
-  A.addEventListener('pointerdown',onAsmDown);window.addEventListener('pointermove',onAsmMove);window.addEventListener('pointerup',onAsmUp);
+  A.addEventListener('pointerdown',onAsmDown);window.addEventListener('pointermove',onAsmMove);window.addEventListener('pointerup',onAsmUp);window.addEventListener('pointercancel',()=>{if(DRAG){clearTimeout(DRAG.lp);DRAG=null;$('dragGhost').style.display='none';}});
+  A.addEventListener('click',e=>{const t=e.target.closest('[data-end]');if(t)placeAt('end');});
   A.addEventListener('click',e=>{const t=e.target.closest('button,[data-p]');if(!t)return;const pl=curPlan();
     if(t.dataset.p){AUI.plan=t.dataset.p;AUI.sel.clear();AUI.aa=null;AUI.mode='cur';closeEditor();renderAsm(true);}
     else if(t.id==='newPlan')newPlan();
+    else if(t.id==='pickCancel'){AUI.pick=null;AUI.flash='';renderAsm(true);}
+    else if(t.id==='eMove'){AUI.pick={kind:'car',id:AUI.edit};closeEditor();renderAsm(true);}
     else if(t.dataset.d&&t.closest('#dtSeg')){if(editable(pl))commitAsm(()=>{pl.dtrack=t.dataset.d;});}
     else if(t.dataset.dd){if(editable(pl))commitAsm(()=>{pl.dep=Math.max(Math.ceil((S.t+ASSEMBLE)/60)*60,pl.dep+ +t.dataset.dd);});}
     else if(t.dataset.m){AUI.mode=t.dataset.m;closeEditor();AUI.sel.clear();renderAsm(true);}
@@ -343,7 +366,7 @@ function initAsmUI(){
       commitAsm(()=>{for(const id of ids){const old=cargoOf(vById(id))||{t:0};const nc=prev[id];if(old.shp&&old.t&&nc.shp===null)shpFromCar(id,pl);else if(old.shp&&nc.t<old.t)shpFromCar(id,pl,old.t-nc.t);S.asm.cargo[id]=nc;}});AUI.sel.clear();AUI.bulk=null;renderAsm(true);}});
   SD.addEventListener('input',e=>{const t=e.target;if(t.dataset.rule){const k=t.dataset.rule,v=+t.value;paintSlider(t);commitAsm(()=>{S.asm.rules[k]=v;});const lab=t.parentElement.querySelector('b');const ru=RULE_UI.find(x=>x[0]===k);if(lab&&ru)lab.textContent=ru[5](v);}});
   SD.addEventListener('change',e=>{const t=e.target;if(t.id==='bLoad'){const v=parseFloat(t.value);if(!isNaN(v))AUI.bulk.t=Math.max(0,v);renderAsm(true);}});
-  window.addEventListener('keydown',e=>{if(VIEW!=='asm'||e.key!=='Escape')return;if(AUI.edit){closeEditor();renderAsm(true);}else if(AUI.confirm){AUI.confirm=false;renderAsm(true);}else if(AUI.sel.size){AUI.sel.clear();renderAsm(true);}else if(AUI.mode==='sug'){AUI.mode='cur';renderAsm(true);}},true);
+  window.addEventListener('keydown',e=>{if(VIEW!=='asm'||e.key!=='Escape')return;if(AUI.pick){AUI.pick=null;AUI.flash='';renderAsm(true);}else if(AUI.edit){closeEditor();renderAsm(true);}else if(AUI.confirm){AUI.confirm=false;renderAsm(true);}else if(AUI.sel.size){AUI.sel.clear();renderAsm(true);}else if(AUI.mode==='sug'){AUI.mode='cur';renderAsm(true);}},true);
   window.addEventListener('resize',()=>renderAsm(true));
   document.addEventListener('pointerdown',e=>{if(AUI.edit&&!e.target.closest('#cedit')&&!e.target.closest('.car')){closeEditor();renderAsm(true);}},true);}
 function applySuggested(){const pl=curPlan();const sg=suggest(pl);if(!sg.changes.length)return;commitAsm(()=>{for(const ch of sg.changes)applyChange(ch,pl);});AUI.mode='cur';renderAsm(true);}

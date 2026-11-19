@@ -5,7 +5,9 @@ A lab experiment from [Digital Unknown](https://www.digitalunknown.com/spare-par
 The sim is a single self-contained HTML file. No build step, no dependencies. Open it in a browser.
 
 ## Run it
-Open `yard-control-v2.html`.
+Live: https://autonomous-rail-yard.vercel.app
+
+Or open `yard-control-v2.html` locally.
 
 ## What's in it
 - Hump yard track graph with 45° turnouts: receiving R-01..04, hump, bowl B-01..12, charging CH-01/02, departure D-01..03, sidings
@@ -16,6 +18,8 @@ Open `yard-control-v2.html`.
 - **Fault injector:** stuck turnouts, retarder failure, charger outage, battery drop, blocked track, from the panel or right-click on the map
 - **Assembly view:** build outbound trains from yard inventory, assign cargo per car (type, tonnes, hazmat, reefer), with live checks for length, gross weight, axle load, block order, hazmat adjacency, battery range, and brake margin. Send to yard and the sim pulls, marshals, and departs it.
 
+- **Mobile:** the same file adapts to phones (≤820 px wide, or landscape). The map fills the screen with pinch-zoom and one-finger pan, there's a compact play/speed bar and a touch-scrub timeline, and Metrics, Faults, and Variables open as bottom sheets. Long-press the map for the fault menu. In Assembly, sections stack and you tap to place cars and shipments.
+
 Keyboard: Space play/pause, ←/→ scrub, +/− zoom, 0 fit.
 
 ![Yard view with active faults](images/yard-faults.png)
@@ -23,8 +27,8 @@ Keyboard: Space play/pause, ←/→ scrub, +/− zoom, 0 fit.
 ![Cargo editor](images/cargo-editor.png)
 
 ## Layout
-- `yard-control-v2.html`: the build
+- `yard-control-v2.html`: the build (`index.html` is the same file, served at the live link)
 - `v2/src/`: v2 source. `python3 v2/build.py` rebuilds `v2/index.html` (copy it to `yard-control-v2.html`)
-- `v2/test/`: Playwright tests (`npm i` in `v2/test`, then `node e2e.js`, `scrub.js`, `faults.js`, `anchor.js`, `asm.js`, plus `soak.js` / `fsoak.js`)
+- `v2/test/`: Playwright tests (`npm i` in `v2/test`, then `node e2e.js`, `scrub.js`, `faults.js`, `anchor.js`, `asm.js`, `mobile.js` (iPhone emulation), plus `soak.js` / `fsoak.js`)
 
 Simulated data, not live telemetry.

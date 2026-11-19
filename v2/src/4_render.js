@@ -125,7 +125,7 @@ function plLabel(pl){const n=pl.veh.length;
   if(pl.state==='pulling')return `${pl.id} ×${n} ${b} → ${EDGES[pl.dtrack].track}`;
   if(pl.state==='assembling'){const r=pl.departT-S.t;return r>0?`${pl.id} ×${n} ${b} · dep ${Math.ceil(r/60)}m`:`${pl.id} ×${n} ${b} · wait exit`;}
   return `${pl.id} ×${n} ${b} → ML2 W`;}
-function draw(){
+function draw(){if(!mapC.width||!mapC.height||!stat.width||!stat.height)return;
   const ctx=mctx;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=C.bg;ctx.fillRect(0,0,mapC.width,mapC.height);
   if(staticDirty){drawStatic();staticDirty=false;}ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(stat,0,0);
   ctx.setTransform(DPR*K,0,0,DPR*K,DPR*OX,DPR*OY);ctx.lineCap='butt';

@@ -106,7 +106,7 @@ function renderDossier(){const dz=$('dossier');
         row('AVG SoC',socHTML(soc))+row(pl.kind==='in'?'BLOCKS':'DEST BLOCK',blocks)+row('TRACK',tr?EDGES[tr.route[tr.ri]].track:'Off-map · ML1')+
         row('STATE',plLabel(pl).replace(pl.id,'').replace(/^ ×\d+ ?/,'')||pl.state)+row('COUPLERS','0 · virtual link')+
         `<div class="dz-chips">${vs.map(v=>`<i title="${v.id}" style="background:${socColor(v.soc)}"></i>`).join('')}</div>`;return;}}
-  dz.className='';dz.innerHTML=`<div class="dz-k">Nothing selected</div><div class="dz-empty">Click a vehicle or platoon tag to see its battery, block, track and state.</div>`;
+  dz.className='';dz.innerHTML=''; // nothing selected: the dossier stays hidden
 }
 function refresh(force){
   $('clock').textContent=fmtT(S.t);
@@ -129,7 +129,7 @@ function refresh(force){
   const lc=$('liveChip');lc.classList.toggle('replay',rp);lc.classList.toggle('on',!rp&&running);$('liveTxt').textContent=rp?'REPLAY '+fmtT(S.t).slice(0,7)+(running?' · '+speed+'×':''):running?'LIVE · '+speed+'×':'PAUSED';
   const lb=$('liveBtn');lb.className=rp?'go':'on';lb.innerHTML=rp?'<i></i>Go live':'<i></i>LIVE';
   $('zPct').textContent=Math.round(view.z*100)+'%';
-  renderFaultList();renderDossier();drawTL();renderAsm(force);
+  renderFaultList();renderDossier();drawTL();renderAsm(force);mobileTick();
 }
 function frame(now){const dtr=Math.min(0.1,(now-last)/1000);last=now;
   if(running){acc+=dtr*SIM_PER_SEC*speed;let n=0;while(acc>=DT&&n<240){step();acc-=DT;n++;}if(n>=240)acc=0;}
@@ -206,8 +206,8 @@ $('legendWrap').addEventListener('mouseleave',()=>setLegend(legPinned,false));
 document.addEventListener('pointerdown',e=>{if(legPinned&&!e.target.closest('#legendWrap'))setLegend(false,false);},true);
 function reset(){newState();advance(90*60);selected=null;closeEditor();AUI.sel.clear();AUI.aa=null;AUI.plan='PL-52';setRunning(false);updateFaultUI();refresh(true);}
 window.addEventListener('resize',()=>{resize();refresh(true);});
-initAsmUI();
-syncInputs();newState();advance(90*60);resize();updateFaultUI();refresh(true);requestAnimationFrame(frame);
+initAsmUI();initMobile();
+syncInputs();newState();advance(90*60);resize();mobileView();updateFaultUI();refresh(true);requestAnimationFrame(frame);
 // embedded fonts can land after the first canvas paint: repaint the cached static layer once they are ready
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{staticDirty=true;refresh(true);});
 // test hooks
@@ -222,9 +222,9 @@ window.__yard={get S(){return S;},P,advance:s=>{advance(s);refresh(true);},setFa
   inject:sp=>{const f=uiInject(sp);return f?f.id:null;},clearFault:id=>uiClear(id),clearAll:()=>uiClearAll(),faults:()=>JSON.parse(JSON.stringify(S.flist)),
   TURNOUTS,pathOK:(a,b)=>!!pathBetween(a,b),swXY:id=>{const n=SWBY[id].node;const r=mapC.getBoundingClientRect();const q=W2S(n.x,n.y);return [q[0]+r.left,q[1]+r.top];},
   edgeXY:(id,fr)=>{const e=EDGES[id];const p=pointAt(e,e.len*(fr==null?.5:fr));const r=mapC.getBoundingClientRect();const q=W2S(p[0],p[1]);return [q[0]+r.left,q[1]+r.top];},
-  crestXY:()=>{const r=mapC.getBoundingClientRect();const q=W2S(NODES.CR.x,NODES.CR.y);return [q[0]+r.left,q[1]+r.top];},setPicking:on=>setPicking(on)};
+  crestXY:()=>{const r=mapC.getBoundingClientRect();const q=W2S(NODES.CR.x,NODES.CR.y);return [q[0]+r.left,q[1]+r.top];},setPicking:on=>setPicking(on),isMobile:()=>isMobile(),openSheet:k=>openSheet(k),get sheet(){return MSHEET;},get popOpen(){return !!popEl;}};
 window.__asm={planChecks,suggest,autoAssign,applyChange,setView,get view(){return VIEW;},AUI,plan:()=>curPlan(),send:()=>sendPlan(),applySuggested:()=>applySuggested(),
-  commit:fn=>commitAsm(()=>fn(S,curPlan())),assign:(shp,car)=>commitAsm(()=>assignShp(shp,car,curPlan())),newPlan:()=>newPlan(),render:()=>renderAsm(true),openEditor:id=>openEditor(id),clk};
+  commit:fn=>commitAsm(()=>fn(S,curPlan())),get pick(){return AUI.pick;},assign:(shp,car)=>commitAsm(()=>assignShp(shp,car,curPlan())),newPlan:()=>newPlan(),render:()=>renderAsm(true),openEditor:id=>openEditor(id),clk};
 })();
 </script>
 </body></html>
